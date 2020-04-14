@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Quick Clash Detection Tool</Name>
+    <Assembly>ClashDetection.dll</Assembly>
+    <AddInId>C2FCC854-EF0E-47EA-B087-08434401CFFF</AddInId>
+    <FullClassName>ClashDetection.App</FullClassName>
+    <Text>Quick Clash Detection Tool</Text>
+    <VendorId>LAOS</VendorId>
+    <VendorDescription>Luis Alonso Otero Seminario, www.dynoscript.com</VendorDescription>
+  </AddIn>
+</RevitAddIns>
