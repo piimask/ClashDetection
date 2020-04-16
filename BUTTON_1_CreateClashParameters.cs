@@ -44,234 +44,259 @@ namespace ClashDetection
 
 
 			#region BUTTONS 
+
+
 			//void BUTTON_1_CreateClashParameters()
 			//{
-				try
+			#region Button_1
+			try
+			{
+				#region try region
+				//UIDocument uidoc = this.ActiveUIDocument; // documento activo
+				//Document doc = this.ActiveUIDocument.Document; // documento
+				//Application app = this.Application; // archivo aplication
+
+				List<DefinitionGroup> defGroups = new List<DefinitionGroup>(); // lista vacia
+
+				List<DefinitionGroup> grupos = new List<DefinitionGroup>(); // lista vacia
+				List<DefinitionGroup> grupos_existe = new List<DefinitionGroup>(); // lista vacia
+
+				#region Abrimos el Shared Parameter File actual
+				DefinitionFile sharedParameterFile = app.OpenSharedParameterFile(); // Abrimos el archivo .txt de shared parameters
+
+				foreach (DefinitionGroup dg in sharedParameterFile.Groups)
 				{
-					//UIDocument uidoc = this.ActiveUIDocument; // documento activo
-					//Document doc = this.ActiveUIDocument.Document; // documento
-					//Application app = this.Application; // archivo aplication
+					defGroups.Add(dg);
+				}
+				#endregion          // defGroups
 
-					List<DefinitionGroup> defGroups = new List<DefinitionGroup>(); // lista vacia
-
-					List<DefinitionGroup> grupos = new List<DefinitionGroup>(); // lista vacia
-					List<DefinitionGroup> grupos_existe = new List<DefinitionGroup>(); // lista vacia
-
-					DefinitionFile sharedParameterFile = app.OpenSharedParameterFile(); // Abrimos el archivo .txt de shared parameters
-					
-					foreach (DefinitionGroup dg in sharedParameterFile.Groups)
+				for (int i = 0; i < defGroups.Count(); i++) // Para cada Grupo en Shared Parameters de proyecto
+				{
+					DefinitionGroup dg = defGroups[i]; // 1er grupo de parametro, primero
+					if (dg.Name.ToString() == "ClashParameters") // si YA EXISTE el grupo "ClashParameters" usamos ese grupo.
 					{
-						defGroups.Add(dg);
-					}
-
-
-					for (int i = 0; i < defGroups.Count(); i++) // Para cada Grupo en Shared Parameters de proyecto
-					{
-						DefinitionGroup dg = defGroups[i]; // 1er grupo de parametro, primero
-						if (dg.Name.ToString() == "ClashParameters") // si YA EXISTE el grupo "ClashParameters" usamos ese grupo.
-						{
-							grupos_existe.Add(dg);
-							ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
-							ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
-							LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
-							FilteredElementCollector DUcoll = new FilteredElementCollector(doc);
-							IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // recolectamos todos los ductos del proyecto
-
-							Element e = ducts.First(); // primer ducto
-
-							Parameter param = e.LookupParameter("Clash"); // buscamos el parametro "Clash" con el elemento e
-
-							ElementClassFilter elemFilter2 = new ElementClassFilter(typeof(FamilyInstance));
-							ElementCategoryFilter DUCategoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_DuctFitting);
-							LogicalAndFilter DUInstancesFilter2 = new LogicalAndFilter(elemFilter, DUCategoryfilter);
-							FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc);
-							IList<Element> ductsfit = DUcoll2.WherePasses(DUInstancesFilter).ToElements(); //recolectamos todos los ducts fittings del proyecto
-
-							Element e2 = ductsfit.First(); // primer duct fitting
-
-							Parameter param2 = e2.LookupParameter("Clash"); // buscamos el parametro "clash" con el elemento e2 = ducto fitting o fammily instance
-							string aplicar = "siaplicar";
-							if (null == param) // si no existe el parametro "Clash" entonces tenemos que:
-							{
-								// crear los parametros obteniendo informacion del archivo de texto: Shared Parameters existente
-
-
-								//							TaskDialog.Show("MENSAJE DE ALERTA", "Si te aparece este error: \n\n" 
-								//							                +" 1.- Borrar el Grupo 'ClashParameters' del archivo de parametros compartidos. Junto con el grupo borra todos los Parametros que este grupo contiene."
-								//							                +"\n2.- Despúes de borrar, finalmente borra los Project Parameters que se hayan creado y vuelve a ejecutar, esta vez sí funcionará creando todos los CLASH Parameters necesarios. Suerte!"
-								//							                + Environment.NewLine
-								//							               	+ "\nPara más información sobre cómo hacer esto visita: wwww.dynoscript.com");
-
-								// crear parametros obteniendo informacion del archivo de texto: Shared Parameters
-								DYNO_CreateClashParameters_ModelElements_SharedParameterExisting();
-								DYNO_SetEmptyYesNoParameters();
-								DYNO_SetIDValue();
-								//DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
-								DYNO_CreateClashSchedules(); // crea todas las CLASH Schedules para todas las categorias
-								//DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
-
-							}
-							else // SI existe todos los parametros y el parametro "Clash"
-							{
-								//TaskDialog.Show("Mensaje", "Los Clash Parameters ya existen! Todos sus valores volverán a su valor por defecto.",TaskDialogCommonButtons.Yes);
-								
-								if (forms.MessageBox.Show("Los Clash Parameters ya existen! Todos sus valores volverán a su valor por defecto." + Environment.NewLine + " \n¿Desea continuar?\n", "Dynoscript", forms.MessageBoxButtons.YesNo) == forms.DialogResult.Yes)
-								{
-									DYNO_SetEmptyYesNoParameters();
-									DYNO_SetIDValue();
-									DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
-																		
-									aplicar = "noaplicar";
-									continue;
-								}
-								else
-								{
-									forms.Application.Exit();
-									break;
-								}
-							}
-
-							//DYNO_CreateClashSchedules();
-							//DYNO_CreateClashFilterMultipleElementsInView();
-
-							// get a ViewFamilyType for a 3D View
-							ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
-														 OfClass(typeof(ViewFamilyType)).
-														 Cast<ViewFamilyType>()
-															 where v.ViewFamily == ViewFamily.ThreeDimensional
-															 select v).First();
-
-
-							using (Transaction t = new Transaction(doc, "Create COORD view"))
-							{
-								t.Start();
-
-								View3D COORD = View3D.CreateIsometric(doc, viewFamilyType.Id);
-								//COORD.Name = "COORD";
-
-								COORD.DisplayStyle = DisplayStyle.Shading;
-								COORD.DetailLevel = ViewDetailLevel.Fine;
-								//string view_name = "COORD";
-
-								FilteredElementCollector DUFcoll = new FilteredElementCollector(doc).OfClass(typeof(View3D));
-								List<View3D> views = new List<View3D>(); // lista vacia
-								List<View3D> views_COORD = new List<View3D>(); // lista vacia
-								int numero = 1;
-								foreach (View3D ve in DUFcoll)
-								{
-									views.Add(ve); // lista con todos los View3d del proyecto
-								}
-								for (int n = 0; n < views.Count(); n++)
-								{
-									View3D ve = views[n];
-									if (ve.Name.Contains("COORD"))
-									{
-										views_COORD.Add(ve); // todas la vistas3d con nombre que contiene "COORD"
-
-										//numero = numero + 1;
-									}
-
-								}
-
-								if (views_COORD.Count() == 0)
-								{
-									COORD.Name = "COORD";
-								}
-								else
-								{
-									for (int m = 0; m < views_COORD.Count(); m++)
-									{
-										View3D ve = views_COORD[m];
-										if (ve.Name.Contains("COORD" + "  Copy "))
-										{
-											numero = numero + 1;
-										}
-										else
-										{
-											numero = 1; // solo COORD
-										}
-									}
-									COORD.Name = "COORD" + "  Copy " + (numero).ToString();
-								}
-
-								List<Element> riv = new List<Element>();
-								FilteredElementCollector links = new FilteredElementCollector(doc, COORD.Id);
-								ElementCategoryFilter linkFilter = new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks);
-								links.WhereElementIsNotElementType();
-								links.WherePasses(linkFilter);
-								riv.AddRange(links.ToElements());
-
-								t.Commit();
-								uidoc.ActiveView = COORD;
-
-							}
-							if (aplicar == "siaplicar")
-							{
-								DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
-							}
-
-						}
-						else // si NO EXISTE el grupo "ClashParameters" en shared parameters tenemos que crearlo por PRIMERA VEZ
-						{
-							grupos.Add(dg);
-						}
-					}
-
-					//bool isEmpty = !grupos_existe.Any(); 
-					bool isEmpty = (grupos_existe.Any() == false); //¡esta vacio? Rpta: TRUE
-																   //TaskDialog.Show("GRUPOS EXISTE", isEmpty.ToString());
-					if (isEmpty) // si esta vacio TRUE significa que NO EXISTE Group = "ClashParameters" y crearemos todo por PRIMERA VEZ
-					{
+						#region Si ya existe el Grupo Clash Parameters en el Shared Parameter actual
+						grupos_existe.Add(dg);
 						ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
 						ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
 						LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
 						FilteredElementCollector DUcoll = new FilteredElementCollector(doc);
-						IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements();
+						IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // recolectamos todos los ductos del proyecto
 
-						Element e = ducts.First();
+						Element e = ducts.First(); // primer ducto
 
-						Parameter param = e.LookupParameter("Clash"); // obtenemos el parametro "Clash"
-						if (null == param) // si no existe el parametro "Clash"
+						Parameter param = e.LookupParameter("Clash"); // buscamos el parametro "Clash" con el elemento e
+
+						ElementClassFilter elemFilter2 = new ElementClassFilter(typeof(FamilyInstance));
+						ElementCategoryFilter DUCategoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_DuctFitting);
+						LogicalAndFilter DUInstancesFilter2 = new LogicalAndFilter(elemFilter, DUCategoryfilter);
+						FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc);
+						IList<Element> ductsfit = DUcoll2.WherePasses(DUInstancesFilter).ToElements(); //recolectamos todos los ducts fittings del proyecto
+
+						Element e2 = ductsfit.First(); // primer duct fitting
+
+						Parameter param2 = e2.LookupParameter("Clash"); // buscamos el parametro "clash" con el elemento e2 = ducto fitting o fammily instance
+						string aplicar = "siaplicar";
+						if (null == param) // si no existe el parametro "Clash" entonces tenemos que:
 						{
-							DYNO_CreateClashParameters_ModelElements(); // crea todos los parametros y grupo "clashparameters" por primera vez
-							DYNO_SetEmptyYesNoParameters(); // coloca valor vacio a parametros "ClashSolved" y  "Done" a todos los elementos y categorias
-							DYNO_SetIDValue(); // coloca valor ID a todos los elementos
+							// crear los parametros obteniendo informacion del archivo de texto: Shared Parameters existente
 
+
+							//							TaskDialog.Show("MENSAJE DE ALERTA", "Si te aparece este error: \n\n" 
+							//							                +" 1.- Borrar el Grupo 'ClashParameters' del archivo de parametros compartidos. Junto con el grupo borra todos los Parametros que este grupo contiene."
+							//							                +"\n2.- Despúes de borrar, finalmente borra los Project Parameters que se hayan creado y vuelve a ejecutar, esta vez sí funcionará creando todos los CLASH Parameters necesarios. Suerte!"
+							//							                + Environment.NewLine
+							//							               	+ "\nPara más información sobre cómo hacer esto visita: wwww.dynoscript.com");
+
+							// crear parametros obteniendo informacion del archivo de texto: Shared Parameters
+							DYNO_CreateClashParameters_ModelElements_SharedParameterExisting();
+							DYNO_SetEmptyYesNoParameters();
+							DYNO_SetIDValue();
+							//DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
 							DYNO_CreateClashSchedules(); // crea todas las CLASH Schedules para todas las categorias
-							DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+														 //DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
 
 						}
-						else // si el parametro "Clash" si existe 
+						else // SI existe todos los parametros y el parametro "Clash"
 						{
-							DYNO_SetEmptyYesNoParameters(); // coloca valor vacio a parametros "ClashSolved" y  "Done" a todos los elementos y categorias TOdo el documento
-							DYNO_SetIDValue();  // coloca valor ID a todos los elementos TOdo el documento
-							DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
-																 //DYNO_CreateClashSchedules(); // crea todas las CLASH Schedules para todas las categorias
-																 //DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+							//TaskDialog.Show("Mensaje", "Los Clash Parameters ya existen! Todos sus valores volverán a su valor por defecto.",TaskDialogCommonButtons.Yes);
+							//forms.MessageBox.Show("Mensaje", "Los Clash Parameters ya existen! Todos sus valores volverán a su valor por defecto.", forms.MessageBoxButtons.YesNo);
+							if (forms.MessageBox.Show("Los Clash Parameters ya existen! Todos sus valores volverán a su valor por defecto." + Environment.NewLine + " \n¿Desea continuar?\n", "Dynoscript", forms.MessageBoxButtons.YesNo) == forms.DialogResult.Yes)
+							{
+								DYNO_SetEmptyYesNoParameters();
+								DYNO_SetIDValue();
+								DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
+																	 //TaskDialog.Show("fdfdd", "funciono mierda");
+								aplicar = "noaplicar";
+								continue;
+							}
+							else
+							{
+								//						        MessageBox.Show("The application has been closed successfully.", "Application Closed!", MessageBoxButtons.OK);
+
+								forms.Application.Exit();
+								break;
+								//return;
+
+								//						    	this.Activate();
+							}
 						}
-					}
 
-					else // si esta vacio FALSE significa que SI EXISTE Group = "ClashParameters" y rellenaremos todos los valores de parametros vacios ya creados previamente.
+
+						//CreateClashParameters_Family();
+						//CreateClashParameters_Elements();
+						//CreateClashParameters_FamilyInstance();
+
+
+						//DYNO_CreateClashSchedules();
+						//DYNO_CreateClashFilterMultipleElementsInView();
+
+						// get a ViewFamilyType for a 3D View
+						ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
+													 OfClass(typeof(ViewFamilyType)).
+													 Cast<ViewFamilyType>()
+														 where v.ViewFamily == ViewFamily.ThreeDimensional
+														 select v).First();
+
+
+						using (Transaction t = new Transaction(doc, "Create COORD view"))
+						{
+							t.Start();
+
+							View3D COORD = View3D.CreateIsometric(doc, viewFamilyType.Id);
+							//COORD.Name = "COORD";
+
+							COORD.DisplayStyle = DisplayStyle.Shading;
+							COORD.DetailLevel = ViewDetailLevel.Fine;
+							//string view_name = "COORD";
+
+							FilteredElementCollector DUFcoll = new FilteredElementCollector(doc).OfClass(typeof(View3D));
+							List<View3D> views = new List<View3D>(); // lista vacia
+							List<View3D> views_COORD = new List<View3D>(); // lista vacia
+							int numero = 1;
+							foreach (View3D ve in DUFcoll)
+							{
+								views.Add(ve); // lista con todos los View3d del proyecto
+							}
+							for (int n = 0; n < views.Count(); n++)
+							{
+								View3D ve = views[n];
+								if (ve.Name.Contains("COORD"))
+								{
+									views_COORD.Add(ve); // todas la vistas3d con nombre que contiene "COORD"
+
+									//numero = numero + 1;
+								}
+
+							}
+
+							if (views_COORD.Count() == 0)
+							{
+								COORD.Name = "COORD";
+							}
+							else
+							{
+								for (int m = 0; m < views_COORD.Count(); m++)
+								{
+									View3D ve = views_COORD[m];
+									if (ve.Name.Contains("COORD" + "  Copy "))
+									{
+										numero = numero + 1;
+									}
+									else
+									{
+										numero = 1; // solo COORD
+									}
+								}
+								COORD.Name = "COORD" + "  Copy " + (numero).ToString();
+							}
+
+							List<Element> riv = new List<Element>();
+							FilteredElementCollector links = new FilteredElementCollector(doc, COORD.Id);
+							ElementCategoryFilter linkFilter = new ElementCategoryFilter(BuiltInCategory.OST_RvtLinks);
+							links.WhereElementIsNotElementType();
+							links.WherePasses(linkFilter);
+							riv.AddRange(links.ToElements());
+							//                		foreach (Element link in riv) 
+							//                		{
+							//                			
+							//                		}
+
+							t.Commit();
+							uidoc.ActiveView = COORD;
+
+						}
+						if (aplicar == "siaplicar")
+						{
+							DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+							DYNO_CreateClashSOLVEDFilterMultipleElementsInView(); // Crea y coloca el filtro CLASH SOLVED a la vista FILTER VIEW
+						}
+						#endregion
+					}
+					else // si NO EXISTE el grupo "ClashParameters" en shared parameters tenemos que crearlo por PRIMERA VEZ
 					{
-						//DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+						grupos.Add(dg);
 					}
-
 				}
-				catch (Exception ex)
+
+				//bool isEmpty = !grupos_existe.Any(); 
+				bool isEmpty = (grupos_existe.Any() == false); //¡esta vacio? Rpta: TRUE
+															   //TaskDialog.Show("GRUPOS EXISTE", isEmpty.ToString());
+				if (isEmpty) // si esta vacio TRUE significa que NO EXISTE Group = "ClashParameters" y crearemos todo por PRIMERA VEZ
 				{
+					#region Cuando no existe el GRupo "ClashParameters" en el Shared Parameter File actual
+					ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
+					ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
+					LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
+					FilteredElementCollector DUcoll = new FilteredElementCollector(doc);
+					IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements();
 
+					Element e = ducts.First();
 
-					TaskDialog.Show("Error ex", ex.ToString());
-					throw;
+					Parameter param = e.LookupParameter("Clash"); // obtenemos el parametro "Clash"
+					if (null == param) // si no existe el parametro "Clash"
+					{
+						DYNO_CreateClashParameters_ModelElements(); // crea todos los parametros y grupo "clashparameters" por primera vez
+						DYNO_SetEmptyYesNoParameters(); // coloca valor vacio a parametros "ClashSolved" y  "Done" a todos los elementos y categorias
+						DYNO_SetIDValue(); // coloca valor ID a todos los elementos
+
+						DYNO_CreateClashSchedules(); // crea todas las CLASH Schedules para todas las categorias
+						DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+						DYNO_CreateClashSOLVEDFilterMultipleElementsInView(); // Crea y coloca el filtro CLASH SOLVED a la vista FILTER VIEW
+					}
+					else // si el parametro "Clash" si existe 
+					{
+						DYNO_SetEmptyYesNoParameters(); // coloca valor vacio a parametros "ClashSolved" y  "Done" a todos los elementos y categorias TOdo el documento
+						DYNO_SetIDValue();  // coloca valor ID a todos los elementos TOdo el documento
+						DYNO_SetNoValueAllParameters_doc();  // Coloca valor vacio a todos los parametros nuevos.
+															 //DYNO_CreateClashSchedules(); // crea todas las CLASH Schedules para todas las categorias
+															 //DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
+					}
+					#endregion
 				}
-				finally
+
+				else // si esta vacio FALSE significa que SI EXISTE Group = "ClashParameters" y rellenaremos todos los valores de parametros vacios ya creados previamente.
 				{
-					//DYNO_CreateClashFilterMultipleElementsInView();
+					//DYNO_CreateClashFilterMultipleElementsInView(); // Crea y coloca los filtros YES CLASH y NO CLASH a la vista FILTER VIEW
 				}
+				#endregion
+			}
 
+			catch (Exception ex)
+			{
+
+
+				//TaskDialog.Show("Error ex", ex.ToString());
+				throw;
+			}
+			finally
+			{
+				//DYNO_CreateClashFilterMultipleElementsInView();
+			}
+			#endregion
 			//} // Funciona para todos los casos. Solo crea 1 vez ClashSchedules y ClashViewFilter OK!
 
-			
+
 			#endregion
 
 			#region DYNOSCRIPTS
@@ -327,7 +352,7 @@ namespace ClashDetection
 				ElementClassFilter elemFilter5 = new ElementClassFilter(typeof(FlexDuct));
 				ElementClassFilter elemFilter6 = new ElementClassFilter(typeof(FlexPipe));
 
-				// Create a category filter for Ducts PIpes COnduit Calbe tray Flexduct flex pipes
+				// Create a category filter for Ducts
 				ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
 				ElementCategoryFilter DUCategoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
 				ElementCategoryFilter DUCategoryfilter3 = new ElementCategoryFilter(BuiltInCategory.OST_Conduit);
@@ -335,8 +360,8 @@ namespace ClashDetection
 				ElementCategoryFilter DUCategoryfilter5 = new ElementCategoryFilter(BuiltInCategory.OST_FlexDuctCurves);
 				ElementCategoryFilter DUCategoryfilter6 = new ElementCategoryFilter(BuiltInCategory.OST_FlexPipeCurves);
 
-				
-				// Create a logic And filter for all  Family instances
+
+				// Create a logic And filter for all MechanicalEquipment Family
 				LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
 				LogicalAndFilter DUInstancesFilter2 = new LogicalAndFilter(elemFilter2, DUCategoryfilter2);
 				LogicalAndFilter DUInstancesFilter3 = new LogicalAndFilter(elemFilter3, DUCategoryfilter3);
@@ -570,6 +595,8 @@ namespace ClashDetection
 				DefinitionFile myDefinitionFile = app.OpenSharedParameterFile();
 
 				// get a group
+				//Only works with a GroupParameterName which already exists in the SharedParameters file, e.g. "Dimensions". Not ideal!
+				//Also this seems quite redundant because later I am inserting the new parameter on the "Data" ParameterGroup… How to go around this?
 				DefinitionGroup myGroup = myDefinitionFile.Groups.Create("ClashParameters");
 
 				// create an instance definition in definition group MyParameters
@@ -803,6 +830,10 @@ namespace ClashDetection
 					links.WhereElementIsNotElementType();
 					links.WherePasses(linkFilter);
 					riv.AddRange(links.ToElements());
+					//                		foreach (Element link in riv) 
+					//                		{
+					//                			
+					//                		}
 
 					t.Commit();
 					uidoc.ActiveView = COORD;
@@ -829,6 +860,8 @@ namespace ClashDetection
 				//		 	string paramName7 = "ID Element";
 				//		 	string paramName8 = "Percent Done";
 				//		 	string paramName9 = "Zone";
+				//CreateClashParameters_Elements();
+				//CreateClashParameters_Family();
 
 				// open shared parameter file
 				DefinitionFile myDefinitionFile = app.OpenSharedParameterFile();
@@ -1006,6 +1039,35 @@ namespace ClashDetection
 				}
 
 
+
+				//		 // category Duct Fittings
+				//		 
+				//		 ElementClassFilter DUFFilter = new ElementClassFilter(typeof(FamilyInstance));
+				//		 // Create a category filter for MechanicalEquipment
+				//		 ElementCategoryFilter DUFCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctFitting);
+				//		 // Create a logic And filter for all MechanicalEquipment Family
+				//		 LogicalAndFilter DUFInstancesFilter = new LogicalAndFilter(DUFFilter, DUFCategoryfilter);
+				//		 // Apply the filter to the elements in the active document
+				//		 FilteredElementCollector DUFcoll = new FilteredElementCollector(doc);
+				//		 IList<Element> ductfittings = DUFcoll.WherePasses(DUFInstancesFilter).ToElements();
+				//		 
+				//		 foreach (Element e in ductfittings) 
+				//		 {
+				//		 Parameter param = e.LookupParameter("Clash Solved");
+				//		 Parameter param2 = e.LookupParameter("Done");
+				//		 
+				//		 using (Transaction t = new Transaction(doc, "parametersDU"))
+				//		 {
+				//		 t.Start();
+				//		param.Set(1);
+				//		 param.Set(0);
+				//		 
+				//		 param2.Set(1);
+				//		 param2.Set(0);
+				//		t.Commit();
+				//		 }
+				//		 } 
+
 				// category Duct.
 				ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
 				ElementClassFilter elemFilter2 = new ElementClassFilter(typeof(Pipe));
@@ -1033,23 +1095,48 @@ namespace ClashDetection
 
 				// Apply the filter to the elements in the active document
 				FilteredElementCollector DUcoll = new FilteredElementCollector(doc);
+
 				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements();
 
+
+
 				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc);
+
 				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
 
+
+
 				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc);
+
 				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
 
 
+
 				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc);
+
 				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
 
+
 				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc);
+
 				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
 
+
+
 				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc);
+
 				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
+
+
+				List<Element> allProducts = new List<Element>();
+				allProducts.Concat(ducts);
+				allProducts.Concat(pipes);
+				allProducts.Concat(conduits);
+				allProducts.Concat(cabletrays);
+				allProducts.Concat(flexducts);
+				allProducts.Concat(flexpipes);
+				allProducts.ToList();
+
 
 				foreach (Element e in ducts)
 				{
@@ -1362,6 +1449,35 @@ namespace ClashDetection
 					}
 				}
 
+
+
+				// category Mechanical Equipment
+
+
+				//		 		// category ducts fittings
+				//		 		ElementClassFilter DUFelemFilter = new ElementClassFilter(typeof(FamilyInstance));
+				//		 		// Create a category filter for Ducts
+				//		 		ElementCategoryFilter DUFCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctFitting);
+				//		 		// Create a logic And filter for all MechanicalEquipment Family
+				//		 		LogicalAndFilter DUFInstancesFilter = new LogicalAndFilter(DUFelemFilter, DUFCategoryfilter);
+				//		 		// Apply the filter to the elements in the active document
+				//		 		FilteredElementCollector DUFcoll = new FilteredElementCollector(doc);
+				//		 		IList<Element> ductfittings = DUFcoll.WherePasses(DUFInstancesFilter).ToElements();
+				//				foreach (Element e in ductfittings) 
+				//		 		{
+				//		 			Parameter param = e.LookupParameter("ID Element");
+				//		 
+				//		 			Autodesk.Revit.DB.ElementId selectedId = e.Id;
+				//		 			string idString = selectedId.IntegerValue.ToString();
+				//		 
+				//		 			using (Transaction t = new Transaction(doc, "ID Element"))
+				//		 			{
+				//		 				t.Start();
+				//						param.Set(idString);
+				//						t.Commit();
+				//		 			}
+				//		 		}
+
 			} // Coloca calor ID Element al parametro ELEMENT ID TOdo el documento
 
 			void DYNO_SetIDValue_ActiveView()
@@ -1566,9 +1682,36 @@ namespace ClashDetection
 					}
 				}
 
+
+
+				// category Mechanical Equipment
+
+
+				//		 		// category ducts fittings
+				//		 		ElementClassFilter DUFelemFilter = new ElementClassFilter(typeof(FamilyInstance));
+				//		 		// Create a category filter for Ducts
+				//		 		ElementCategoryFilter DUFCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctFitting);
+				//		 		// Create a logic And filter for all MechanicalEquipment Family
+				//		 		LogicalAndFilter DUFInstancesFilter = new LogicalAndFilter(DUFelemFilter, DUFCategoryfilter);
+				//		 		// Apply the filter to the elements in the active document
+				//		 		FilteredElementCollector DUFcoll = new FilteredElementCollector(doc);
+				//		 		IList<Element> ductfittings = DUFcoll.WherePasses(DUFInstancesFilter).ToElements();
+				//				foreach (Element e in ductfittings) 
+				//		 		{
+				//		 			Parameter param = e.LookupParameter("ID Element");
+				//		 
+				//		 			Autodesk.Revit.DB.ElementId selectedId = e.Id;
+				//		 			string idString = selectedId.IntegerValue.ToString();
+				//		 
+				//		 			using (Transaction t = new Transaction(doc, "ID Element"))
+				//		 			{
+				//		 				t.Start();
+				//						param.Set(idString);
+				//						t.Commit();
+				//		 			}
+				//		 		}
+
 			} // Coloca calor ID Element al parametro ELEMENT ID a solo los elementos de la vista activa.
-
-
 
 			void DYNO_CheckClashSolved(List<Element> clash_no_)
 			{
@@ -1628,9 +1771,13 @@ namespace ClashDetection
 						using (Transaction t = new Transaction(doc, "parametersME"))
 						{
 							t.Start();
-							if (param.AsInteger() == 1)
+							if (param.AsInteger() == 1 && param2.AsString() == "YES")
 							{
 								param2.Set("");
+								clashsolved_yes.Add(e);
+							}
+							else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+							{
 								clashsolved_yes.Add(e);
 							}
 							else
@@ -1642,11 +1789,16 @@ namespace ClashDetection
 							{
 								clash_yes.Add(e);
 							}
-
+							//						 	if (!(param2.AsString() == "YES"))
+							//						 	{
+							//						 		clash_no.Add(e);
+							//						 	}
 							t.Commit();
 						}
 					}
 				}
+
+
 
 				// category Duct.
 				ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
@@ -1675,21 +1827,36 @@ namespace ClashDetection
 
 				// Apply the filter to the elements in the active document
 				FilteredElementCollector DUcoll = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements();
 
+
+
 				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
 
+
+
 				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
 
+
+
 				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
 
+
 				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
 
+
+
 				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
 
 				foreach (Element e in ducts)
@@ -1700,9 +1867,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters duct"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1730,9 +1901,13 @@ namespace ClashDetection
 					using (Transaction t2 = new Transaction(doc, "parameters pipes"))
 					{
 						t2.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1761,9 +1936,13 @@ namespace ClashDetection
 					using (Transaction t3 = new Transaction(doc, "parameters conduits"))
 					{
 						t3.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1791,9 +1970,13 @@ namespace ClashDetection
 					using (Transaction t4 = new Transaction(doc, "parameters cable tray"))
 					{
 						t4.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1822,9 +2005,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters flexduct"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1853,9 +2040,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters flexpipes"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1905,7 +2096,6 @@ namespace ClashDetection
 
 				}
 			}
-
 
 			// todo con todo documento
 			void DYNO_IntersectMultipleElementsToMultipleCategory_doc()
@@ -2268,21 +2458,497 @@ namespace ClashDetection
 
 				// Apply the filter to the elements in the active document
 				FilteredElementCollector DUcoll = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // DUCTS
 
 				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
 
 				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
-				
+
 				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
 
 				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
 
 				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
+
+				List<Element> clash_yesA = new List<Element>();
+				List<Element> clash_noA = new List<Element>();
+
+				string mensaje = "";
+
+				List<Element> allElements = new List<Element>();
+
+				foreach (Element i in ducts)
+				{
+					allElements.Add(i);
+				}
+				foreach (Element i in pipes)
+				{
+					allElements.Add(i);
+				}
+				foreach (Element i in conduits)
+				{
+					allElements.Add(i);
+				}
+				foreach (Element i in cabletrays)
+				{
+					allElements.Add(i);
+				}
+				foreach (Element i in flexducts)
+				{
+					allElements.Add(i);
+				}
+				foreach (Element i in flexpipes)
+				{
+					allElements.Add(i);
+				}
+
+				// foreach ( Element e in ducts) // OUT: mensaje2  y  clash_yesA<List>
+				#region 
+
+				foreach (Element e in allElements)
+				{
+
+					ElementId eID = e.Id;
+
+					GeometryElement geomElement = e.get_Geometry(new Options());
+
+					Solid solid = null;
+
+					foreach (GeometryObject geomObj in geomElement)
+					{
+						solid = geomObj as Solid;
+						if (solid != null)
+						{
+							break;
+						}
+
+					}// solid = geomObj;
+					 // Find intersections 
+
+					// category Duct.
+					ElementClassFilter DUFilter = new ElementClassFilter(typeof(Duct));
+					ElementClassFilter DUFilter2 = new ElementClassFilter(typeof(Pipe));
+					ElementClassFilter DUFilter3 = new ElementClassFilter(typeof(Conduit));
+					ElementClassFilter DUFilter4 = new ElementClassFilter(typeof(CableTray));
+					ElementClassFilter DUFilter5 = new ElementClassFilter(typeof(FlexDuct));
+					ElementClassFilter DUFilter6 = new ElementClassFilter(typeof(FlexPipe));
+					// Create a category filter for Ducts
+					ElementCategoryFilter DU2Categoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
+					ElementCategoryFilter DU2Categoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
+					ElementCategoryFilter DU2Categoryfilter3 = new ElementCategoryFilter(BuiltInCategory.OST_Conduit);
+					ElementCategoryFilter DU2Categoryfilter4 = new ElementCategoryFilter(BuiltInCategory.OST_CableTray);
+					ElementCategoryFilter DU2Categoryfilter5 = new ElementCategoryFilter(BuiltInCategory.OST_FlexDuctCurves);
+					ElementCategoryFilter DU2Categoryfilter6 = new ElementCategoryFilter(BuiltInCategory.OST_FlexPipeCurves);
+
+					LogicalAndFilter DU2InstancesFilter = new LogicalAndFilter(DUFilter, DU2Categoryfilter);
+					LogicalAndFilter DU2InstancesFilter2 = new LogicalAndFilter(DUFilter2, DU2Categoryfilter2);
+					LogicalAndFilter DU2InstancesFilter3 = new LogicalAndFilter(DUFilter3, DU2Categoryfilter3);
+					LogicalAndFilter DU2InstancesFilter4 = new LogicalAndFilter(DUFilter4, DU2Categoryfilter4);
+					LogicalAndFilter DU2InstancesFilter5 = new LogicalAndFilter(DUFilter5, DU2Categoryfilter5);
+					LogicalAndFilter DU2InstancesFilter6 = new LogicalAndFilter(DUFilter6, DU2Categoryfilter6);
+
+					ICollection<ElementId> collectoreID = new List<ElementId>();
+					collectoreID.Add(eID);
+
+					//Collector = Clashes
+					ExclusionFilter filter = new ExclusionFilter(collectoreID);
+					ExclusionFilter filter2 = new ExclusionFilter(collectoreID);
+					ExclusionFilter filter3 = new ExclusionFilter(collectoreID);
+					ExclusionFilter filter4 = new ExclusionFilter(collectoreID);
+					ExclusionFilter filter5 = new ExclusionFilter(collectoreID);
+					ExclusionFilter filter6 = new ExclusionFilter(collectoreID);
+
+					FilteredElementCollector collector = new FilteredElementCollector(doc, activeView.Id);
+					FilteredElementCollector collector2 = new FilteredElementCollector(doc, activeView.Id);
+					FilteredElementCollector collector3 = new FilteredElementCollector(doc, activeView.Id);
+					FilteredElementCollector collector4 = new FilteredElementCollector(doc, activeView.Id);
+					FilteredElementCollector collector5 = new FilteredElementCollector(doc, activeView.Id);
+					FilteredElementCollector collector6 = new FilteredElementCollector(doc, activeView.Id);
+
+					collector.OfClass(typeof(Duct));
+					collector2.OfClass(typeof(Pipe));
+					collector3.OfClass(typeof(Conduit));
+					collector4.OfClass(typeof(CableTray));
+					collector5.OfClass(typeof(FlexDuct));
+					collector6.OfClass(typeof(FlexPipe));
+
+					collector.WherePasses(DU2InstancesFilter);
+					collector2.WherePasses(DU2InstancesFilter2);
+					collector3.WherePasses(DU2InstancesFilter3);
+					collector4.WherePasses(DU2InstancesFilter4);
+					collector5.WherePasses(DU2InstancesFilter5);
+					collector6.WherePasses(DU2InstancesFilter6);
+
+					collector.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector.WherePasses(filter);
+					collector2.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector2.WherePasses(filter2);
+					collector3.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector3.WherePasses(filter3);
+					collector4.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector4.WherePasses(filter4);
+					collector5.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector5.WherePasses(filter5);
+					collector6.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
+					collector6.WherePasses(filter6);
+
+					if (collector.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector.First().Category.Name.ToString() + " / ID: " + collector.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+
+					}
+
+					else if (collector2.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector2.First().Category.Name.ToString() + " / ID: " + collector2.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector3.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector3.First().Category.Name.ToString() + " / ID: " + collector3.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector4.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector4.First().Category.Name.ToString() + " / ID: " + collector4.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector5.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector5.First().Category.Name.ToString() + " / ID: " + collector5.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector6.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector6.First().Category.Name.ToString() + " / ID: " + collector6.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else
+					{
+						clash_noA.Add(e);
+					}
+
+
+
+					foreach (Element elem in collector)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+					foreach (Element elem in collector2)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+					foreach (Element elem in collector3)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+					foreach (Element elem in collector4)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+					foreach (Element elem in collector5)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+					foreach (Element elem in collector6)
+					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+						if (clash_yesA.Contains(elem) == false)
+						{
+							clash_yesA.Add(elem);
+						}
+						else
+						{
+							clash_noA.Add(elem);
+						}
+					}
+
+
+					mensaje = mensaje + Environment.NewLine + (collector.Count() + collector2.Count() + collector3.Count()
+															+ collector4.Count() + collector5.Count() + collector6.Count()).ToString()
+															+ " elements intersect with the selected element ("
+															+ e.Name.ToString()
+															+ e.Category.Name.ToString() + " id:"
+															+ eID.ToString() + ")" + Environment.NewLine;
+
+				}
+
+				string mensaje2 = "";
+				string msg = "";
+				//			foreach (Element elem in clash_noA)
+				//			{
+				//				Parameter param = elem.LookupParameter("Clash");
+				//			 	string clashNOvacio = "";
+				//			 	using (Transaction t = new Transaction(doc, "Clash NO"))
+				//			 	{
+				//			 		t.Start();
+				//					param.Set(clashNOvacio);
+				//					t.Commit();
+				//			 	}
+				//			}
+
+				foreach (Element elem in clash_yesA)
+				{
+					msg += "Nombre : " + elem.Name.ToString() + " ID : " + elem.Id.ToString() + "Categoria : " + elem.Category.Name.ToString() + Environment.NewLine;
+					// set clash YES
+					Parameter param = elem.LookupParameter("Clash");
+					string clash = "YES";
+					using (Transaction t = new Transaction(doc, "Clash YES"))
+					{
+						t.Start();
+						param.Set(clash);
+						t.Commit();
+					}
+				}
+				mensaje2 = mensaje + Environment.NewLine + "\nSon: " + clash_yesA.Count().ToString() + " el numero de Elementos con Clashes : " + Environment.NewLine + msg;
+				//TaskDialog.Show("Dynoscript", mensaje2);
+				#endregion
+			} // todo con todo VIsta ACtiva
+			  // todo con todo VIsta ACtiva
+			List<Element> DYNO_IntersectMultipleElementsToMultipleCategory_ReturnListaClashNO() // retorna: Lista de Elementos con clash NO
+			{
+				// Find intersections between Ducts category with selected element
+
+				//UIDocument uidoc = this.ActiveUIDocument;
+				//Document doc = this.ActiveUIDocument.Document;
+				//Application app = this.Application;
+
+				// Get Active View
+				View activeView = uidoc.ActiveView;
+
+				// category Duct PIpes COnduit Calbe tray Flexduct flex pipes
+				ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
+				ElementClassFilter elemFilter2 = new ElementClassFilter(typeof(Pipe));
+				ElementClassFilter elemFilter3 = new ElementClassFilter(typeof(Conduit));
+				ElementClassFilter elemFilter4 = new ElementClassFilter(typeof(CableTray));
+				ElementClassFilter elemFilter5 = new ElementClassFilter(typeof(FlexDuct));
+				ElementClassFilter elemFilter6 = new ElementClassFilter(typeof(FlexPipe));
+
+				// Create a category filter for Ducts
+				ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
+				ElementCategoryFilter DUCategoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
+				ElementCategoryFilter DUCategoryfilter3 = new ElementCategoryFilter(BuiltInCategory.OST_Conduit);
+				ElementCategoryFilter DUCategoryfilter4 = new ElementCategoryFilter(BuiltInCategory.OST_CableTray);
+				ElementCategoryFilter DUCategoryfilter5 = new ElementCategoryFilter(BuiltInCategory.OST_FlexDuctCurves);
+				ElementCategoryFilter DUCategoryfilter6 = new ElementCategoryFilter(BuiltInCategory.OST_FlexPipeCurves);
+
+
+				// Create a logic And filter for all MechanicalEquipment Family
+				LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
+				LogicalAndFilter DUInstancesFilter2 = new LogicalAndFilter(elemFilter2, DUCategoryfilter2);
+				LogicalAndFilter DUInstancesFilter3 = new LogicalAndFilter(elemFilter3, DUCategoryfilter3);
+				LogicalAndFilter DUInstancesFilter4 = new LogicalAndFilter(elemFilter4, DUCategoryfilter4);
+				LogicalAndFilter DUInstancesFilter5 = new LogicalAndFilter(elemFilter5, DUCategoryfilter5);
+				LogicalAndFilter DUInstancesFilter6 = new LogicalAndFilter(elemFilter6, DUCategoryfilter6);
+
+				// Apply the filter to the elements in the active document
+				FilteredElementCollector DUcoll = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // DUCTS
+
+				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
+
+				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
+
+				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
+
+				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc, activeView.Id);
+
+				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
+
+				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
 
 				List<Element> clash_yesA = new List<Element>();
@@ -2436,301 +3102,6 @@ namespace ClashDetection
 					//					clash_yesA.Add(e);
 					//				}
 					//bool alreadyExist = false;
-
-					foreach (Element elem in collector)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-					foreach (Element elem in collector2)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-					foreach (Element elem in collector3)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-					foreach (Element elem in collector4)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-					foreach (Element elem in collector5)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-					foreach (Element elem in collector6)
-					{
-						if (clash_yesA.Contains(elem) == false)
-						{
-							clash_yesA.Add(elem);
-						}
-						else
-						{
-							clash_noA.Add(elem);
-						}
-					}
-
-
-					mensaje = mensaje + Environment.NewLine + (collector.Count() + collector2.Count() + collector3.Count()
-															+ collector4.Count() + collector5.Count() + collector6.Count()).ToString()
-															+ " elements intersect with the selected element ("
-															+ e.Name.ToString()
-															+ e.Category.Name.ToString() + " id:"
-															+ eID.ToString() + ")" + Environment.NewLine;
-
-				}
-
-				string mensaje2 = "";
-				string msg = "";
-				//			foreach (Element elem in clash_noA)
-				//			{
-				//				Parameter param = elem.LookupParameter("Clash");
-				//			 	string clashNOvacio = "";
-				//			 	using (Transaction t = new Transaction(doc, "Clash NO"))
-				//			 	{
-				//			 		t.Start();
-				//					param.Set(clashNOvacio);
-				//					t.Commit();
-				//			 	}
-				//			}
-
-				foreach (Element elem in clash_yesA)
-				{
-					msg += "Nombre : " + elem.Name.ToString() + " ID : " + elem.Id.ToString() + "Categoria : " + elem.Category.Name.ToString() + Environment.NewLine;
-					// set clash YES
-					Parameter param = elem.LookupParameter("Clash");
-					string clash = "YES";
-					using (Transaction t = new Transaction(doc, "Clash YES"))
-					{
-						t.Start();
-						param.Set(clash);
-						t.Commit();
-					}
-				}
-				mensaje2 = mensaje + Environment.NewLine + "\nSon: " + clash_yesA.Count().ToString() + " el numero de Elementos con Clashes : " + Environment.NewLine + msg;
-				//TaskDialog.Show("Dynoscript", mensaje2);
-				#endregion
-			} // todo con todo VIsta ACtiva
-			  // todo con todo VIsta ACtiva
-			List<Element> DYNO_IntersectMultipleElementsToMultipleCategory_ReturnListaClashNO() // retorna: Lista de Elementos con clash NO
-			{
-				// Find intersections between Ducts category with selected element
-
-				//UIDocument uidoc = this.ActiveUIDocument;
-				//Document doc = this.ActiveUIDocument.Document;
-				//Application app = this.Application;
-
-				// Get Active View
-				View activeView = uidoc.ActiveView;
-
-				// category Duct PIpes COnduit Calbe tray Flexduct flex pipes
-				ElementClassFilter elemFilter = new ElementClassFilter(typeof(Duct));
-				ElementClassFilter elemFilter2 = new ElementClassFilter(typeof(Pipe));
-				ElementClassFilter elemFilter3 = new ElementClassFilter(typeof(Conduit));
-				ElementClassFilter elemFilter4 = new ElementClassFilter(typeof(CableTray));
-				ElementClassFilter elemFilter5 = new ElementClassFilter(typeof(FlexDuct));
-				ElementClassFilter elemFilter6 = new ElementClassFilter(typeof(FlexPipe));
-
-				// Create a category filter for Ducts
-				ElementCategoryFilter DUCategoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
-				ElementCategoryFilter DUCategoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
-				ElementCategoryFilter DUCategoryfilter3 = new ElementCategoryFilter(BuiltInCategory.OST_Conduit);
-				ElementCategoryFilter DUCategoryfilter4 = new ElementCategoryFilter(BuiltInCategory.OST_CableTray);
-				ElementCategoryFilter DUCategoryfilter5 = new ElementCategoryFilter(BuiltInCategory.OST_FlexDuctCurves);
-				ElementCategoryFilter DUCategoryfilter6 = new ElementCategoryFilter(BuiltInCategory.OST_FlexPipeCurves);
-
-
-				// Create a logic And filter for all MechanicalEquipment Family
-				LogicalAndFilter DUInstancesFilter = new LogicalAndFilter(elemFilter, DUCategoryfilter);
-				LogicalAndFilter DUInstancesFilter2 = new LogicalAndFilter(elemFilter2, DUCategoryfilter2);
-				LogicalAndFilter DUInstancesFilter3 = new LogicalAndFilter(elemFilter3, DUCategoryfilter3);
-				LogicalAndFilter DUInstancesFilter4 = new LogicalAndFilter(elemFilter4, DUCategoryfilter4);
-				LogicalAndFilter DUInstancesFilter5 = new LogicalAndFilter(elemFilter5, DUCategoryfilter5);
-				LogicalAndFilter DUInstancesFilter6 = new LogicalAndFilter(elemFilter6, DUCategoryfilter6);
-
-				// Apply the filter to the elements in the active document
-				FilteredElementCollector DUcoll = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // DUCTS
-
-				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
-
-				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
-
-				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
-
-				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
-
-				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc, activeView.Id);
-				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
-
-				List<Element> clash_yesA = new List<Element>();
-				List<Element> clash_noA = new List<Element>();
-
-				string mensaje = "";
-
-				List<Element> allElements = new List<Element>();
-
-				foreach (Element i in ducts)
-				{
-					allElements.Add(i);
-				}
-				foreach (Element i in pipes)
-				{
-					allElements.Add(i);
-				}
-				foreach (Element i in conduits)
-				{
-					allElements.Add(i);
-				}
-				foreach (Element i in cabletrays)
-				{
-					allElements.Add(i);
-				}
-				foreach (Element i in flexducts)
-				{
-					allElements.Add(i);
-				}
-				foreach (Element i in flexpipes)
-				{
-					allElements.Add(i);
-				}
-
-				// foreach ( Element e in ducts) // OUT: mensaje2  y  clash_yesA<List>
-				#region 
-
-				foreach (Element e in allElements)
-				{
-
-					ElementId eID = e.Id;
-
-					GeometryElement geomElement = e.get_Geometry(new Options());
-
-					Solid solid = null;
-
-					foreach (GeometryObject geomObj in geomElement)
-					{
-						solid = geomObj as Solid;
-						if (solid != null)
-						{
-							break;
-						}
-
-					}// solid = geomObj;
-					 // Find intersections 
-
-					// category Duct.
-					ElementClassFilter DUFilter = new ElementClassFilter(typeof(Duct));
-					ElementClassFilter DUFilter2 = new ElementClassFilter(typeof(Pipe));
-					ElementClassFilter DUFilter3 = new ElementClassFilter(typeof(Conduit));
-					ElementClassFilter DUFilter4 = new ElementClassFilter(typeof(CableTray));
-					ElementClassFilter DUFilter5 = new ElementClassFilter(typeof(FlexDuct));
-					ElementClassFilter DUFilter6 = new ElementClassFilter(typeof(FlexPipe));
-					// Create a category filter for Ducts
-					ElementCategoryFilter DU2Categoryfilter = new ElementCategoryFilter(BuiltInCategory.OST_DuctCurves);
-					ElementCategoryFilter DU2Categoryfilter2 = new ElementCategoryFilter(BuiltInCategory.OST_PipeCurves);
-					ElementCategoryFilter DU2Categoryfilter3 = new ElementCategoryFilter(BuiltInCategory.OST_Conduit);
-					ElementCategoryFilter DU2Categoryfilter4 = new ElementCategoryFilter(BuiltInCategory.OST_CableTray);
-					ElementCategoryFilter DU2Categoryfilter5 = new ElementCategoryFilter(BuiltInCategory.OST_FlexDuctCurves);
-					ElementCategoryFilter DU2Categoryfilter6 = new ElementCategoryFilter(BuiltInCategory.OST_FlexPipeCurves);
-
-					LogicalAndFilter DU2InstancesFilter = new LogicalAndFilter(DUFilter, DU2Categoryfilter);
-					LogicalAndFilter DU2InstancesFilter2 = new LogicalAndFilter(DUFilter2, DU2Categoryfilter2);
-					LogicalAndFilter DU2InstancesFilter3 = new LogicalAndFilter(DUFilter3, DU2Categoryfilter3);
-					LogicalAndFilter DU2InstancesFilter4 = new LogicalAndFilter(DUFilter4, DU2Categoryfilter4);
-					LogicalAndFilter DU2InstancesFilter5 = new LogicalAndFilter(DUFilter5, DU2Categoryfilter5);
-					LogicalAndFilter DU2InstancesFilter6 = new LogicalAndFilter(DUFilter6, DU2Categoryfilter6);
-
-					ICollection<ElementId> collectoreID = new List<ElementId>();
-					collectoreID.Add(eID);
-
-					//Collector = Clashes
-					ExclusionFilter filter = new ExclusionFilter(collectoreID);
-					ExclusionFilter filter2 = new ExclusionFilter(collectoreID);
-					ExclusionFilter filter3 = new ExclusionFilter(collectoreID);
-					ExclusionFilter filter4 = new ExclusionFilter(collectoreID);
-					ExclusionFilter filter5 = new ExclusionFilter(collectoreID);
-					ExclusionFilter filter6 = new ExclusionFilter(collectoreID);
-
-					FilteredElementCollector collector = new FilteredElementCollector(doc, activeView.Id);
-					FilteredElementCollector collector2 = new FilteredElementCollector(doc, activeView.Id);
-					FilteredElementCollector collector3 = new FilteredElementCollector(doc, activeView.Id);
-					FilteredElementCollector collector4 = new FilteredElementCollector(doc, activeView.Id);
-					FilteredElementCollector collector5 = new FilteredElementCollector(doc, activeView.Id);
-					FilteredElementCollector collector6 = new FilteredElementCollector(doc, activeView.Id);
-
-					collector.OfClass(typeof(Duct));
-					collector2.OfClass(typeof(Pipe));
-					collector3.OfClass(typeof(Conduit));
-					collector4.OfClass(typeof(CableTray));
-					collector5.OfClass(typeof(FlexDuct));
-					collector6.OfClass(typeof(FlexPipe));
-
-					collector.WherePasses(DU2InstancesFilter);
-					collector2.WherePasses(DU2InstancesFilter2);
-					collector3.WherePasses(DU2InstancesFilter3);
-					collector4.WherePasses(DU2InstancesFilter4);
-					collector5.WherePasses(DU2InstancesFilter5);
-					collector6.WherePasses(DU2InstancesFilter6);
-
-					collector.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector.WherePasses(filter);
-					collector2.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector2.WherePasses(filter2);
-					collector3.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector3.WherePasses(filter3);
-					collector4.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector4.WherePasses(filter4);
-					collector5.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector5.WherePasses(filter5);
-					collector6.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
-					collector6.WherePasses(filter6);
-
-					if (collector.Count() > 0 || collector2.Count() > 0 || collector3.Count() > 0 || collector4.Count() > 0 || collector5.Count() > 0 || collector6.Count() > 0)
-					{
-						clash_yesA.Add(e);
-					}
-					else
-					{
-						clash_noA.Add(e);
-					}
 
 					foreach (Element elem in collector)
 					{
@@ -3229,6 +3600,19 @@ namespace ClashDetection
 
 						if (collector.Count() > 0)
 						{
+							Parameter param = e.LookupParameter("Clash Category");
+							//						Parameter paramID = e.LookupParameter("ID Element");
+
+							string elemcategory = collector.First().Category.Name.ToString() + " / ID: " + collector.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+
+								t.Commit();
+							}
+
 							if (clash_yesA.Contains(e) == false)
 							{
 								clash_yesA.Add(e);
@@ -3243,6 +3627,19 @@ namespace ClashDetection
 
 						foreach (Element elem in collector)
 						{
+							Parameter param = elem.LookupParameter("Clash Category");
+							//						Parameter paramID = elem.LookupParameter("ID Element");
+
+							string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+
+								t.Commit();
+							}
+
 							if (clash_yesA.Contains(elem) == false)
 							{
 								clash_yesA.Add(elem);
@@ -3330,21 +3727,27 @@ namespace ClashDetection
 
 				// Apply the filter to the elements in the active document
 				FilteredElementCollector DUcoll = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> ducts = DUcoll.WherePasses(DUInstancesFilter).ToElements(); // DUCTS
 
 				FilteredElementCollector DUcoll2 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> pipes = DUcoll2.WherePasses(DUInstancesFilter2).ToElements();
 
 				FilteredElementCollector DUcoll3 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> conduits = DUcoll3.WherePasses(DUInstancesFilter3).ToElements();
 
 				FilteredElementCollector DUcoll4 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> cabletrays = DUcoll4.WherePasses(DUInstancesFilter4).ToElements();
 
 				FilteredElementCollector DUcoll5 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexducts = DUcoll5.WherePasses(DUInstancesFilter5).ToElements();
 
 				FilteredElementCollector DUcoll6 = new FilteredElementCollector(doc, activeView.Id);
+
 				IList<Element> flexpipes = DUcoll6.WherePasses(DUInstancesFilter6).ToElements();
 
 				List<Element> allElements = new List<Element>();
@@ -3396,25 +3799,28 @@ namespace ClashDetection
 
 					BuiltInCategory[] bics_fi = new BuiltInCategory[]
 					{
-						//BuiltInCategory.OST_CableTray,
-						BuiltInCategory.OST_CableTrayFitting,
-						// BuiltInCategory.OST_Conduit,
-						BuiltInCategory.OST_ConduitFitting,
-						//BuiltInCategory.OST_DuctCurves,
-						BuiltInCategory.OST_DuctFitting,
-						BuiltInCategory.OST_DuctTerminal,
-						BuiltInCategory.OST_ElectricalEquipment,
-						BuiltInCategory.OST_ElectricalFixtures,
-						BuiltInCategory.OST_LightingDevices,
-						BuiltInCategory.OST_LightingFixtures,
-						BuiltInCategory.OST_MechanicalEquipment,
-						//BuiltInCategory.OST_PipeCurves,
-						BuiltInCategory.OST_PipeFitting,
-						BuiltInCategory.OST_PlumbingFixtures,
-						BuiltInCategory.OST_SpecialityEquipment,
-						BuiltInCategory.OST_Sprinklers
+				    //BuiltInCategory.OST_CableTray,
+				    BuiltInCategory.OST_CableTrayFitting,
+				   // BuiltInCategory.OST_Conduit,
+				    BuiltInCategory.OST_ConduitFitting,
+				    //BuiltInCategory.OST_DuctCurves,
+				    BuiltInCategory.OST_DuctFitting,
+					BuiltInCategory.OST_DuctTerminal,
+					BuiltInCategory.OST_ElectricalEquipment,
+					BuiltInCategory.OST_ElectricalFixtures,
+					BuiltInCategory.OST_LightingDevices,
+					BuiltInCategory.OST_LightingFixtures,
+					BuiltInCategory.OST_MechanicalEquipment,
+				    //BuiltInCategory.OST_PipeCurves,
+				    BuiltInCategory.OST_PipeFitting,
+					BuiltInCategory.OST_PlumbingFixtures,
+					BuiltInCategory.OST_SpecialityEquipment,
+					BuiltInCategory.OST_Sprinklers
 						//BuiltInCategory.OST_Wire,
 
+						//builtInCategory.OST_Walls,
+						//builtInCategory.OST_Ceilings,
+						//BuiltInCategory.OST_StructuralFraming,
 					};
 
 
@@ -3508,8 +3914,6 @@ namespace ClashDetection
 				TaskDialog.Show("Revit", mensaje2);
 				return clash_noA;
 			} // retorna: Lista de Elementos con clash NO
-
-
 
 			void DYNO_IntersectMultipleFamilyInstanceToMultipleFamilyInstances()
 			{
@@ -3615,8 +4019,7 @@ namespace ClashDetection
 					foreach (Solid so in listsolid)
 					{
 
-						TaskDialog.Show("Mensaje", so.ToString());
-
+						TaskDialog.Show("PUTA MIERDA", so.ToString());
 						//				GeometryElement geomElement = e.get_Geometry(new Options() );
 						//				
 						//				GeometryInstance geomFinstace = geomElement.FirstOrDefault() as GeometryInstance;
@@ -3718,8 +4121,6 @@ namespace ClashDetection
 				mensaje2 = mensaje + Environment.NewLine + "\nSon: " + clash_yesA.Count().ToString() + " el numero de Elementos con Clashes : " + Environment.NewLine + msg;
 				TaskDialog.Show("Revit", mensaje2);
 			}
-
-
 
 			void DYNO_ClashManage()
 			{
@@ -3907,7 +4308,8 @@ namespace ClashDetection
 						}
 					}
 				}
-
+				//			List<Element> aa = DYNO_lista_Elements_1(UI_list1); // return : lista de Element
+				//			List<Element> bb = DYNO_lista_FamilyInstance_2(UI_list2); // return : lista de FamilyInstance
 				string a1 = "Numero total UI_list1 = " + UI_list1.Count().ToString() + Environment.NewLine;
 				string a2 = "Numero total UI_list2 = " + UI_list2.Count().ToString() + Environment.NewLine;
 
@@ -3953,7 +4355,16 @@ namespace ClashDetection
 					DYNO_IntersectMultipleElementsToMultipleCategory_UI_doc(UI_list1, UI_list3);
 					DYNO_IntersectMultipleElementsToMultipleFamilyInstances_UI_doc(UI_list1, UI_list4);
 				}
-
+				//			else if (checkBox_2s && checkBox_1s && !checkBox_3s) // TRUE Todo vs TOdoo Vista activa
+				//			{
+				//				DYNO_IntersectMultipleElementsToMultipleCategory();
+				//				DYNO_IntersectMultipleElementsToMultipleFamilyInstances();
+				//			}
+				//			else if (checkBox_2s && checkBox_3s && !checkBox_1s) // TRUE Todo vs TOdoo Todo documento
+				//			{
+				//				DYNO_IntersectMultipleElementsToMultipleCategory_doc();
+				//				DYNO_IntersectMultipleElementsToMultipleFamilyInstances_doc();
+				//			}
 				else
 				{
 
@@ -5451,6 +5862,8 @@ namespace ClashDetection
 
 			} // Elem vs FamilyInstance // Todo documento
 
+
+
 			void DYNO_IntersectMultipleFamilyInstanceToMultipleCategory_UI(List<BuiltInCategory> UI_list1_, List<BuiltInCategory> UI_list4_)
 			{
 				// Find intersections between Ducts category with selected element
@@ -5743,7 +6156,8 @@ namespace ClashDetection
 						{
 							collectoreID.Add(eID);
 						}
-						 
+						//		 			
+						//		 
 						ExclusionFilter filter = new ExclusionFilter(collectoreID);
 						FilteredElementCollector collector = new FilteredElementCollector(doc, activeView.Id);
 
@@ -5864,6 +6278,8 @@ namespace ClashDetection
 
 				}
 
+
+
 				string numero_ductos = clashID_familyinstance.Count().ToString();
 				string mensaje = "Iteraciones de elementos : " + numero_ductos + "\n\n" + Environment.NewLine;
 
@@ -5892,7 +6308,7 @@ namespace ClashDetection
 							break;
 						}
 
-					}
+					}// solid = geomObj;
 					 // Find intersections 
 
 					ICollection<ElementId> collectoreID = new List<ElementId>();
@@ -6184,7 +6600,7 @@ namespace ClashDetection
 						FilteredElementCollector collector = new FilteredElementCollector(doc);
 
 						Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+						Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
 
 						FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6200,8 +6616,9 @@ namespace ClashDetection
 
 
 						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-						filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
-
+						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																											   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+						filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 						for (int i = 0; i < lista_filtros.Count(); i++)
 						{
@@ -6280,7 +6697,135 @@ namespace ClashDetection
 				}
 
 
-			}// Crea filtros en la vista activa
+			}// Crea filtros en la lista de vistas ingresadas
+
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInMultipleViews_UI(List<View3D> lista_3dviews) // Crea filtros en la vista activa
+			{
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
+
+
+
+				foreach (View3D view3d in lista_3dviews)
+				{
+
+					//View activeView = this.ActiveUIDocument.ActiveView;
+					View activeView = view3d;
+
+					//			 	List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					//				List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+					{
+						ta.Start();
+
+						//activeView.Name = "COORD";
+						List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+						List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+						FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+						Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+						FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+						List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+						foreach (ParameterFilterElement e in collector_filterview)
+						{
+							lista_filtros.Add(e);
+						}
+
+
+						List<FilterRule> filterRules = new List<FilterRule>();
+
+						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+
+
+						for (int i = 0; i < lista_filtros.Count(); i++)
+						{
+							if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+							{
+								lista_ParameterFilterElement.Add(lista_filtros[i]);
+								i = lista_filtros.Count();
+								break;
+							}
+
+						}
+
+						if (lista_ParameterFilterElement.Count() == 0)
+						{
+							ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+							//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+							lista_ParameterFilterElement.Add(parameterFilterElement);
+						}
+
+
+
+						ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+						OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+						ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+						ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+						ogs3.SetSurfaceForegroundPatternVisible(true);
+						ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+						activeView.AddFilter(aa.Id);
+
+						activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+						ta.Commit();
+					}
+				}
+
+
+			}// Crea filtros en la lista de vistas ingresadas
+
 
 			void DYNO_CreateClashFilterMultipleElementsInView_UI(View3D view_3d) // Crea filtros en la vista activa
 			{
@@ -6345,8 +6890,8 @@ namespace ClashDetection
 
 					FilteredElementCollector collector = new FilteredElementCollector(doc);
 
-					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash"); // Clash
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved"); // Clash Solved
 
 					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6361,9 +6906,10 @@ namespace ClashDetection
 					List<FilterRule> filterRules_no = new List<FilterRule>();
 
 
-					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
-
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true)); // Clash , EQUAL,  "YES", 
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																										   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 					for (int i = 0; i < lista_filtros.Count(); i++)
 					{
@@ -6440,7 +6986,129 @@ namespace ClashDetection
 					ta.Commit();
 				}
 
-			}// Crea filtros en la vista activa
+			}// Crea filtros en la vista ingresada
+
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(View3D view_3d) // Crea filtros en la vista activa
+			{
+
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				// Get Active View
+				//View activeView = this.ActiveUIDocument.ActiveView;
+				View activeView = view_3d;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
+
+
+
+				using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+				{
+					ta.Start();
+
+					//activeView.Name = "COORD";
+					List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+					List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+					foreach (ParameterFilterElement e in collector_filterview)
+					{
+						lista_filtros.Add(e);
+					}
+
+
+					List<FilterRule> filterRules = new List<FilterRule>();
+
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+
+
+					for (int i = 0; i < lista_filtros.Count(); i++)
+					{
+						if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+						{
+							lista_ParameterFilterElement.Add(lista_filtros[i]);
+							i = lista_filtros.Count();
+							break;
+						}
+
+					}
+
+					if (lista_ParameterFilterElement.Count() == 0)
+					{
+						ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+						//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+						lista_ParameterFilterElement.Add(parameterFilterElement);
+					}
+
+
+
+					ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+					OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+					ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternVisible(true);
+					ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+					activeView.AddFilter(aa.Id);
+
+					activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+					ta.Commit();
+				}
+
+			}// Crea filtros en la vista ingresada
+
 
 			void DYNO_CreateClashFilterMultipleElementsInView() // Crea filtros en la vista activa
 			{
@@ -6505,7 +7173,7 @@ namespace ClashDetection
 					FilteredElementCollector collector = new FilteredElementCollector(doc);
 
 					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
 
 					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6521,7 +7189,9 @@ namespace ClashDetection
 
 
 					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																										   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 
 					for (int i = 0; i < lista_filtros.Count(); i++)
@@ -6600,9 +7270,122 @@ namespace ClashDetection
 				}
 			}// Crea filtros en la vista activa
 
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInView() // Crea filtros en la vista activa
+			{
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				// Get Active View
+				View activeView = uidoc.ActiveView;
+				//View activeView = view_3d;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
 
 
 
+				using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+				{
+					ta.Start();
+
+					//activeView.Name = "COORD";
+					List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+					List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+					foreach (ParameterFilterElement e in collector_filterview)
+					{
+						lista_filtros.Add(e);
+					}
+
+
+					List<FilterRule> filterRules = new List<FilterRule>();
+
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+					for (int i = 0; i < lista_filtros.Count(); i++)
+					{
+						if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+						{
+							lista_ParameterFilterElement.Add(lista_filtros[i]);
+							i = lista_filtros.Count();
+							break;
+						}
+
+					}
+
+					if (lista_ParameterFilterElement.Count() == 0)
+					{
+						ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+						//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+						lista_ParameterFilterElement.Add(parameterFilterElement);
+					}
+
+
+
+					ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+					OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+					ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternVisible(true);
+					ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+					activeView.AddFilter(aa.Id);
+
+					activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+					ta.Commit();
+				}
+			}// Crea filtro cLASH solVED en la vista activa
 
 
 			void DYNO_ClashComments()
@@ -6818,8 +7601,8 @@ namespace ClashDetection
 			{
 				//Document doc = this.ActiveUIDocument.Document;
 				//UIDocument uidoc = this.ActiveUIDocument;
-				//// Get Active View
-				//View activeView = this.ActiveUIDocument.ActiveView;
+				// Get Active View
+				View activeView = uidoc.ActiveView;
 
 				// get elements with "clash" parameter value == "YES"
 				IList<Element> clash = new List<Element>();
@@ -7098,7 +7881,7 @@ namespace ClashDetection
 			{
 				//Document doc = this.ActiveUIDocument.Document;
 				//UIDocument uidoc = this.ActiveUIDocument;
-				//// Get Active View
+				// Get Active View
 				View activeView = uidoc.ActiveView;
 
 				// get elements with "clash" parameter value == "YES"
@@ -7619,6 +8402,8 @@ namespace ClashDetection
 					//Parameter param2 = e.LookupParameter("Clash Solved");
 					//Parameter param3 = e.LookupParameter("Clash Comments");
 					Parameter param4 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7628,6 +8413,7 @@ namespace ClashDetection
 						//param2.Set(1);
 						//param3.Set(param_value);
 						param4.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7637,6 +8423,9 @@ namespace ClashDetection
 					Parameter param = e.LookupParameter("Clash");
 					//Parameter param2 = e.LookupParameter("Clash Comments");
 					Parameter param3 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7645,6 +8434,7 @@ namespace ClashDetection
 						param.Set(param_value);
 						//param2.Set(param_value);
 						param3.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7712,6 +8502,8 @@ namespace ClashDetection
 					//Parameter param2 = e.LookupParameter("Clash Solved");
 					//Parameter param3 = e.LookupParameter("Clash Comments");
 					Parameter param4 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7721,6 +8513,7 @@ namespace ClashDetection
 						//param2.Set(1);
 						//param3.Set(param_value);
 						param4.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7730,6 +8523,8 @@ namespace ClashDetection
 					Parameter param = e.LookupParameter("Clash");
 					//Parameter param2 = e.LookupParameter("Clash Comments");
 					Parameter param3 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7738,6 +8533,7 @@ namespace ClashDetection
 						param.Set(param_value);
 						//param2.Set(param_value);
 						param3.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -8418,17 +9214,32 @@ namespace ClashDetection
 						{
 							transaction.Start();
 
+							//FilteredElementCollector collector = new FilteredElementCollector(doc);
+							//collector.OfCategory(bic);
+							//Get first ElementId of AreaScheme.
+							//ElementId elemId = collector.FirstElementId();
+							//if (elemId != null && elemId != ElementId.InvalidElementId)
+							//{
+							// If you want to create an area schedule, you must use CreateSchedule method with three arguments. 
+							// The value of the second argument must be ElementId of BuiltInCategory.OST_Areas category
+							// and the value of third argument must be ElementId of an AreaScheme.
 							clashSchedule = Autodesk.Revit.DB.ViewSchedule.CreateSchedule(doc, new ElementId(bic));
 
 							doc.Regenerate();
 
+							//Add fields
+
+							//}
 							ScheduleDefinition definition = clashSchedule.Definition;
 
 							IList<SchedulableField> schedulableFields = definition.GetSchedulableFields(); // [a,b,c,s,d,f,....]
 
 
+							//List<SchedulableField> listashparam = [];
+							//SchedulableField[] listashparam = {};
 							List<SchedulableField> listashparam = new List<SchedulableField>();
-
+							//List<ScheduleFieldId> clashId = [];
+							//ScheduleFieldId[] clashId = {};
 							List<ScheduleFieldId> clashId = new List<ScheduleFieldId>();
 
 							foreach (SchedulableField element in schedulableFields)
@@ -8521,6 +9332,8 @@ namespace ClashDetection
 
 							ScheduleField foundField = clashSchedule.Definition.GetField(clashId.FirstOrDefault());
 
+							//AddRegularFieldToSchedule(clashSchedule, new ElementId(BuiltInParameter.RBS_CALCULATED_SIZE));
+							//AddRegularFieldToSchedule(clashSchedule, new ElementId(BuiltInParameter.CURVE_ELEM_LENGTH));
 
 							if (null != clashSchedule)
 							{
@@ -8557,6 +9370,11 @@ namespace ClashDetection
 					TaskDialog.Show("Creating CLASH Schedule", msg + "Se agregaron las siguientes columnas a las tablas: \n\n" + msg3 + Environment.NewLine);
 					// bic in bics
 				}
+
+
+
+
+
 
 			}// no funciona
 
@@ -8599,16 +9417,32 @@ namespace ClashDetection
 					{
 						transaction.Start();
 
+						//FilteredElementCollector collector = new FilteredElementCollector(doc);
+						//collector.OfCategory(bic);
+						//Get first ElementId of AreaScheme.
+						//ElementId elemId = collector.FirstElementId();
+						//if (elemId != null && elemId != ElementId.InvalidElementId)
+						//{
+						// If you want to create an area schedule, you must use CreateSchedule method with three arguments. 
+						// The value of the second argument must be ElementId of BuiltInCategory.OST_Areas category
+						// and the value of third argument must be ElementId of an AreaScheme.
 						clashSchedule = Autodesk.Revit.DB.ViewSchedule.CreateSchedule(doc, new ElementId(bic));
 
 						doc.Regenerate();
 
+						//Add fields
+
+						//}
 						ScheduleDefinition definition = clashSchedule.Definition;
 
 						IList<SchedulableField> schedulableFields = definition.GetSchedulableFields(); // [a,b,c,s,d,f,....]
 
-						List<SchedulableField> listashparam = new List<SchedulableField>();
 
+						//List<SchedulableField> listashparam = [];
+						//SchedulableField[] listashparam = {};
+						List<SchedulableField> listashparam = new List<SchedulableField>();
+						//List<ScheduleFieldId> clashId = [];
+						//ScheduleFieldId[] clashId = {};
 						List<ScheduleFieldId> clashId = new List<ScheduleFieldId>();
 
 						foreach (SchedulableField element in schedulableFields)
@@ -8701,6 +9535,8 @@ namespace ClashDetection
 
 						ScheduleField foundField = clashSchedule.Definition.GetField(clashId.FirstOrDefault());
 
+						//AddRegularFieldToSchedule(clashSchedule, new ElementId(BuiltInParameter.RBS_CALCULATED_SIZE));
+						//AddRegularFieldToSchedule(clashSchedule, new ElementId(BuiltInParameter.CURVE_ELEM_LENGTH));
 
 						if (null != clashSchedule)
 						{
@@ -8734,7 +9570,7 @@ namespace ClashDetection
 						}
 					}
 				}
-				TaskDialog.Show("Creating CLASH Schedule", msg + "Se agregaron las siguientes columnas a las tablas: \n\n" + msg3 + Environment.NewLine);
+				TaskDialog.Show("Creation CLASH Parameters", msg + "Se crearon los siguientes Clash Parameters: \n\n" + msg3 + Environment.NewLine);
 				// bic in bics
 
 			}
@@ -8744,7 +9580,6 @@ namespace ClashDetection
 				//UIDocument uidoc = this.ActiveUIDocument;
 				//Document doc = this.ActiveUIDocument.Document;
 				//Application app = this.Application;
-
 				View view = doc.ActiveView;
 				string view_name = view.Name.ToString(); // nombre de la vista activa 
 				List<bool> listabool_3 = new List<bool>();
@@ -8913,12 +9748,15 @@ namespace ClashDetection
 
 							uidoc.ActiveView = dupleView;
 							DYNO_CreateClashFilterMultipleElementsInView_UI(dupleView);
-						}
+							DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(dupleView);
 
+						}
+						DYNO_CreateClashSOLVEDFilterMultipleElementsInView(); // Crea y coloca el filtro CLASH SOLVED a la vista FILTER VIEW
 					}
 					else if (listabool_1.First() && !(listabool_2.First()) && !(listabool_3.First()))
 					{
 						DYNO_create3DClashSectionBoxView_ELEMENT();
+
 					}
 					else if (listabool_2.First() && !(listabool_1.First()) && !(listabool_3.First()))
 					{
@@ -8948,65 +9786,76 @@ namespace ClashDetection
 				}
 				// get list of all levels
 				//IList<Level> levels = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().OrderBy(l => l.Elevation).ToList();
-
-
-				// get a ViewFamilyType for a 3D View
-				ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
-												 OfClass(typeof(ViewFamilyType)).
-												 Cast<ViewFamilyType>()
-												 where v.ViewFamily == ViewFamily.ThreeDimensional
-												 select v).First();
-
-				List<View3D> tresDclashview = new List<View3D>();
-
-				using (Transaction t = new Transaction(doc, "Create clash 3d view"))
+				if (clash_elements.Count() == 0)
 				{
-					int ctr = 0;
-					// loop through all Elements
-					foreach (Element elem in clash_elements)
-					{
-						t.Start();
-
-						// Create the 3d view
-						View3D clashview = View3D.CreateIsometric(doc, viewFamilyType.Id);
-
-						Parameter param = elem.LookupParameter("Clash Category");
-
-						string param_string = param.AsString();
-						string param_string2 = param_string.Replace(':', '_');
-
-						// Set the name of the view
-						clashview.Name = "COORD - Section Box  " + elem.Name.ToString() + " / "
-																+ "ID  " + elem.Id.ToString() + " / "
-																+ " Clash Category " + param_string2;
-
-
-
-
-						// Set the name of the transaction
-						// A transaction can be renamed after it has been started
-						t.SetName("Create view " + clashview.Name);
-
-						// Create a new BoundingBoxXYZ to define a 3D rectangular space
-						BoundingBoxXYZ elem_bb = elem.get_BoundingBox(null);
-
-						clashview.SetSectionBox(elem_bb);
-
-						clashview.DisplayStyle = DisplayStyle.Shading;
-						clashview.DetailLevel = ViewDetailLevel.Fine;
-
-						t.Commit();
-
-						// Open the just-created view
-						// There cannot be an open transaction when the active view is set
-						tresDclashview.Add(clashview);
-
-						ctr++;
-					}
-					uidoc.ActiveView = tresDclashview.First();
-					DYNO_CreateClashFilterMultipleElementsInMultipleViews_UI(tresDclashview);
-
+					TaskDialog.Show("Dynoscript", "No se encontraron Elementos con Clash en la Vista Activa!");
+					return;
 				}
+				else
+				{
+					// get a ViewFamilyType for a 3D View
+					ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
+													 OfClass(typeof(ViewFamilyType)).
+													 Cast<ViewFamilyType>()
+													 where v.ViewFamily == ViewFamily.ThreeDimensional
+													 select v).First();
+
+					List<View3D> tresDclashview = new List<View3D>();
+
+					using (Transaction t = new Transaction(doc, "Create clash 3d view"))
+					{
+						int ctr = 0;
+						// loop through all Elements
+						foreach (Element elem in clash_elements)
+						{
+							t.Start();
+
+							// Create the 3d view
+							View3D clashview = View3D.CreateIsometric(doc, viewFamilyType.Id);
+
+							Parameter param = elem.LookupParameter("Clash Category");
+
+							string param_string = param.AsString();
+							string param_string2 = param_string.Replace(':', '_');
+
+							// Set the name of the view
+							clashview.Name = "COORD - Section Box  " + elem.Name.ToString() + " / "
+																	+ "ID  " + elem.Id.ToString() + " / "
+																	+ " Clash Category " + param_string2;
+
+
+
+
+							// Set the name of the transaction
+							// A transaction can be renamed after it has been started
+							t.SetName("Create view " + clashview.Name);
+
+							// Create a new BoundingBoxXYZ to define a 3D rectangular space
+							BoundingBoxXYZ elem_bb = elem.get_BoundingBox(null);
+
+							clashview.SetSectionBox(elem_bb);
+
+							//					if (!clashview.IsTemplate) 
+							//					{
+							clashview.DisplayStyle = DisplayStyle.Shading;
+							clashview.DetailLevel = ViewDetailLevel.Fine;
+							//					}
+
+							t.Commit();
+
+							// Open the just-created view
+							// There cannot be an open transaction when the active view is set
+							tresDclashview.Add(clashview);
+
+							ctr++;
+						}
+						uidoc.ActiveView = tresDclashview.First();
+						DYNO_CreateClashFilterMultipleElementsInMultipleViews_UI(tresDclashview);
+						DYNO_CreateClashSOLVEDFilterMultipleElementsInMultipleViews_UI(tresDclashview);
+					}
+				}
+
+
 			} // ONLY THE ACTIVE VIEW
 
 			void DYNO_create3DClashSectionBoxView_LEVELS()
@@ -9084,6 +9933,7 @@ namespace ClashDetection
 				foreach (View3D view in lista3dview)
 				{
 					DYNO_CreateClashFilterMultipleElementsInView_UI(view);
+					DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(view);
 				}
 
 
@@ -9201,6 +10051,11 @@ namespace ClashDetection
 								pointsXmin.Add(minX); // values
 								pointsYmin.Add(minY); // values
 
+								//					    dictionary_ZX_max.Add(maxZ, maxX);
+								//					    dictionary_ZY_max.Add(maxZ, maxY);
+								//					    
+								//					    dictionary_ZX_min.Add(minZ, minX);
+								//					    dictionary_ZY_min.Add(minZ, minY);
 							}
 
 
@@ -9220,6 +10075,9 @@ namespace ClashDetection
 							// X MAX
 
 
+
+
+
 							for (int i = 0; i < pointsZmax.Count; i++)
 							{
 								dictionary_ZY_max.Add(pointsZmax[i], pointsYmax[i]);
@@ -9237,6 +10095,10 @@ namespace ClashDetection
 							// Y MAX
 
 
+
+
+
+
 							for (int i = 0; i < pointsZmin.Count; i++)
 							{
 								dictionary_ZX_min.Add(pointsZmin[i], pointsXmin[i]);
@@ -9252,6 +10114,8 @@ namespace ClashDetection
 							}
 							// X MIN
 
+
+
 							for (int i = 0; i < pointsZmin.Count; i++)
 							{
 								dictionary_ZY_min.Add(pointsZmin[i], pointsYmin[i]);
@@ -9266,6 +10130,8 @@ namespace ClashDetection
 								pointsYmin_sorted.Add(dictionary_ZY_min[pointsZmin[i]]);
 							}
 							// Y MIN
+
+
 
 
 							double Max_Z = pointsZmax.First();
@@ -9287,6 +10153,8 @@ namespace ClashDetection
 
 							myBox.Min = Min;
 							myBox.Max = Max;
+
+
 
 							//BoundingBoxXYZ zone_bb = null;
 
@@ -9330,6 +10198,7 @@ namespace ClashDetection
 				{
 					clash_elements.Add(e);
 				}
+
 
 				//			List<Element> clash_elements_zone = new List<Element>();
 				//		    List<Element> clash_elements_zone_no = new List<Element>();
@@ -9678,7 +10547,41 @@ namespace ClashDetection
 				}
 				finally
 				{
+					//		    		Dictionary<string,XYZ> intersectionPoints_existente = new Dictionary<string, XYZ>();
+					//					List<string> listaclashgridlocation = new List<string>();
+					//					List<string> listaclashgridlocation_unique = new List<string>();    
+					//					
+					//		    		foreach (Element elem in clash_elements)
+					//				    {
+					//				    	Parameter p = elem.LookupParameter("Clash Grid Location");
+					//				    	string p_clashgridloc = p.ToString(); // A/6
+					//				    	listaclashgridlocation.Add(p_clashgridloc);
+					//				    }
+					//		    		var unique_items = new HashSet<string>(listaclashgridlocation);
+					//				    foreach (string s in unique_items)
+					//				    {
+					//				    	listaclashgridlocation_unique.Add(s);
+					//				    }
+					//		    		foreach (KeyValuePair<string,XYZ> kp in intersectionPoints)
+					//				    {
+					//				    	string intersec_key = kp.Key.ToString(); // A/6
+					//
+					//				    	foreach (string i in listaclashgridlocation_unique) 
+					//				    	{
+					//
+					//					    		if (i == intersec_key)
+					//					    		{
+					//					    			intersectionPoints_existente.Add(kp.Key,kp.Value);
+					//					    		}
+					//
+					//
+					//				    	}
+					//				    	
+					//				    }
 
+
+
+					//throw new AccessViolationException();
 					foreach (KeyValuePair<string, XYZ> kp in intersectionPoints)
 					{
 						List<Element> clash_elements_zone = new List<Element>();
@@ -9822,6 +10725,9 @@ namespace ClashDetection
 								//							        }
 								tresDclashview.Add(clashview);
 								t.Commit();
+								// There cannot be an open transaction when the active view is set
+
+
 
 							}
 						}
@@ -9903,6 +10809,21 @@ namespace ClashDetection
 							{
 								clash_elements_zone_ids.Add(elem.Id);
 							}
+
+							//							double Min_X = double.MaxValue;
+							//							//double Min_X = 0;
+							//							double Min_Y = double.MaxValue;
+							//							//double Min_Y = 0;
+							//							
+							//							double Min_Z = double.MaxValue;
+							//							
+							//							// encontrar Min_Y , Min_X , Max_X , Max_Y
+							//							
+							//							
+							//							
+							//							double Max_X = Min_X;
+							//							double Max_Y = Min_Y;
+							//							double Max_Z = Min_Z;
 
 							List<XYZ> lista_pMin = new List<XYZ>();
 							List<XYZ> lista_pMax = new List<XYZ>();
@@ -10025,6 +10946,9 @@ namespace ClashDetection
 
 							msg = msg + Max.ToString() + Environment.NewLine + Min.ToString() + Environment.NewLine + "-----------------------------------------------------------" + Environment.NewLine;
 
+
+
+
 							BoundingBoxXYZ myBox = new BoundingBoxXYZ();
 
 							myBox.Min = Min;
@@ -10048,6 +10972,9 @@ namespace ClashDetection
 
 							tresDclashview.Add(clashview);
 							t.Commit();
+							// There cannot be an open transaction when the active view is set
+
+
 
 						}
 					}
@@ -10062,7 +10989,6 @@ namespace ClashDetection
 				uidoc.ActiveView = tresDclashview.First();
 
 			}
-
 
 			List<Element> DYNO_GetAllClashElements_OnlyActiveView()
 			{

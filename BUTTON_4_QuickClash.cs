@@ -39,21 +39,22 @@ namespace ClashDetection
 			//View activeView = doc.ActiveView;
             string ruta = App.ExecutingAssemblyPath;
 
-			// Empezar a Escribir el código acá
-			#region MACRO CODE
+            // Empezar a Escribir el código acá
+            #region MACRO CODE
 
 
-			#region BUTTONS 
+            #region BUTTONS 
 
 
-			//void BUTTON_4_QuickClash() // clash rapido solo vista activa
-			//{
-				try
-				{
+            //void BUTTON_4_QuickClash() // clash rapido solo vista activa
+            //{
+            #region Buton_4
+            try
+            {
 					List<Element> clash_yes = new List<Element>();
 
 					DYNO_SetNoValueClashParameter(); // Vista Activa , "Clash" y "Clash Grid Location" = " " vacio.
-					DYNO_IntersectMultipleElementsToMultipleCategory(); // Vista Activa
+					DYNO_IntersectMultipleElementsToMultipleCategory(); // Vista Activa eta reeeeeeemilllelllmeirefdaddaactmmttmm no funciona
 					DYNO_IntersectMultipleElementsToMultipleFamilyInstances();// Vista Activa
 					DYNO_SetClashGridLocation();// active view
 					DYNO_SetIDValue_ActiveView(); // active view
@@ -65,22 +66,23 @@ namespace ClashDetection
 					}
 					DYNO_CheckClashSolved(clash_yes);// Vista Activa
 
-				}
+			}
 				catch (Exception ex)
 				{
 					TaskDialog.Show("Error ex", ex.Message.ToString());
 					throw;
 				}
-			//} // clash rapido solo vista activa OK!
+            #endregion
+            //} // clash rapido solo vista activa OK!
 
-			#endregion
+            #endregion
 
-			#region DYNOSCRIPTS
-			/// <summary>
-			/// Set 3D view section box to next options.
-			/// </summary>
-			/// 
-			List<Element> DYNO_lista_Elements_1(List<BuiltInCategory> UI_list1)
+            #region DYNOSCRIPTS
+            /// <summary>
+            /// Set 3D view section box to next options.
+            /// </summary>
+            /// 
+            List<Element> DYNO_lista_Elements_1(List<BuiltInCategory> UI_list1)
 			{
 				//UIDocument uidoc = this.ActiveUIDocument;
 				//Document doc = this.ActiveUIDocument.Document;
@@ -1489,8 +1491,6 @@ namespace ClashDetection
 
 			} // Coloca calor ID Element al parametro ELEMENT ID a solo los elementos de la vista activa.
 
-
-
 			void DYNO_CheckClashSolved(List<Element> clash_no_)
 			{
 				//UIDocument uidoc = this.ActiveUIDocument;
@@ -1549,9 +1549,13 @@ namespace ClashDetection
 						using (Transaction t = new Transaction(doc, "parametersME"))
 						{
 							t.Start();
-							if (param.AsInteger() == 1)
+							if (param.AsInteger() == 1 && param2.AsString() == "YES")
 							{
 								param2.Set("");
+								clashsolved_yes.Add(e);
+							}
+							else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+							{
 								clashsolved_yes.Add(e);
 							}
 							else
@@ -1641,9 +1645,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters duct"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1671,9 +1679,13 @@ namespace ClashDetection
 					using (Transaction t2 = new Transaction(doc, "parameters pipes"))
 					{
 						t2.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1702,9 +1714,13 @@ namespace ClashDetection
 					using (Transaction t3 = new Transaction(doc, "parameters conduits"))
 					{
 						t3.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1732,9 +1748,13 @@ namespace ClashDetection
 					using (Transaction t4 = new Transaction(doc, "parameters cable tray"))
 					{
 						t4.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1763,9 +1783,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters flexduct"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1794,9 +1818,13 @@ namespace ClashDetection
 					using (Transaction t = new Transaction(doc, "parameters flexpipes"))
 					{
 						t.Start();
-						if (param.AsInteger() == 1)
+						if (param.AsInteger() == 1 && param2.AsString() == "YES")
 						{
 							param2.Set("");
+							clashsolved_yes.Add(e);
+						}
+						else if (param.AsInteger() == 1 && !(param2.AsString() == "YES"))
+						{
 							clashsolved_yes.Add(e);
 						}
 						else
@@ -1846,7 +1874,6 @@ namespace ClashDetection
 
 				}
 			}
-
 
 			// todo con todo documento
 			void DYNO_IntersectMultipleElementsToMultipleCategory_doc()
@@ -2354,38 +2381,130 @@ namespace ClashDetection
 					collector6.WherePasses(new ElementIntersectsSolidFilter(solid)).ToElements(); // Apply intersection filter to find matches
 					collector6.WherePasses(filter6);
 
-					if (collector.Count() > 0 || collector2.Count() > 0 || collector3.Count() > 0 || collector4.Count() > 0 || collector5.Count() > 0 || collector6.Count() > 0)
+					if (collector.Count() > 0)
 					{
-						clash_yesA.Add(e);
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector.First().Category.Name.ToString() + " / ID: " + collector.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+
+					}
+
+					else if (collector2.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector2.First().Category.Name.ToString() + " / ID: " + collector2.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector3.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector3.First().Category.Name.ToString() + " / ID: " + collector3.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector4.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector4.First().Category.Name.ToString() + " / ID: " + collector4.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector5.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector5.First().Category.Name.ToString() + " / ID: " + collector5.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
+					}
+					else if (collector6.Count() > 0)
+					{
+						if (clash_yesA.Contains(e) == false)
+						{
+							clash_yesA.Add(e);
+							Parameter param = e.LookupParameter("Clash Category");
+
+							string elemcategory = collector6.First().Category.Name.ToString() + " / ID: " + collector6.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+								t.Commit();
+							}
+						}
 					}
 					else
 					{
 						clash_noA.Add(e);
 					}
-					//		 		else if (collector2.Count() > 0) 
-					//		 		{
-					//					clash_yesA.Add(e);
-					//				}
-					//		 		else if (collector3.Count() > 0) 
-					//		 		{
-					//					clash_yesA.Add(e);
-					//				}
-					//		 		else if (collector4.Count() > 0) 
-					//		 		{
-					//					clash_yesA.Add(e);
-					//				}
-					//		 		else if (collector5.Count() > 0) 
-					//		 		{
-					//					clash_yesA.Add(e);
-					//				}
-					//		 		else if (collector6.Count() > 0) 
-					//		 		{
-					//					clash_yesA.Add(e);
-					//				}
-					//bool alreadyExist = false;
+
+
 
 					foreach (Element elem in collector)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -2397,6 +2516,18 @@ namespace ClashDetection
 					}
 					foreach (Element elem in collector2)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -2408,6 +2539,17 @@ namespace ClashDetection
 					}
 					foreach (Element elem in collector3)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -2419,6 +2561,17 @@ namespace ClashDetection
 					}
 					foreach (Element elem in collector4)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -2430,6 +2583,17 @@ namespace ClashDetection
 					}
 					foreach (Element elem in collector5)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -2441,6 +2605,17 @@ namespace ClashDetection
 					}
 					foreach (Element elem in collector6)
 					{
+						Parameter param = elem.LookupParameter("Clash Category");
+
+						string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+						using (Transaction t = new Transaction(doc, "Clash Category"))
+						{
+							t.Start();
+							param.Set(elemcategory);
+							t.Commit();
+						}
+
 						if (clash_yesA.Contains(elem) == false)
 						{
 							clash_yesA.Add(elem);
@@ -3203,6 +3378,19 @@ namespace ClashDetection
 
 						if (collector.Count() > 0)
 						{
+							Parameter param = e.LookupParameter("Clash Category");
+							//						Parameter paramID = e.LookupParameter("ID Element");
+
+							string elemcategory = collector.First().Category.Name.ToString() + " / ID: " + collector.First().Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+
+								t.Commit();
+							}
+
 							if (clash_yesA.Contains(e) == false)
 							{
 								clash_yesA.Add(e);
@@ -3217,6 +3405,19 @@ namespace ClashDetection
 
 						foreach (Element elem in collector)
 						{
+							Parameter param = elem.LookupParameter("Clash Category");
+							//						Parameter paramID = elem.LookupParameter("ID Element");
+
+							string elemcategory = e.Category.Name.ToString() + " / ID: " + e.Id.ToString();
+
+							using (Transaction t = new Transaction(doc, "Clash Category"))
+							{
+								t.Start();
+								param.Set(elemcategory);
+
+								t.Commit();
+							}
+
 							if (clash_yesA.Contains(elem) == false)
 							{
 								clash_yesA.Add(elem);
@@ -3492,8 +3693,6 @@ namespace ClashDetection
 				return clash_noA;
 			} // retorna: Lista de Elementos con clash NO
 
-
-
 			void DYNO_IntersectMultipleFamilyInstanceToMultipleFamilyInstances()
 			{
 				// Find intersections between Ducts category with selected element
@@ -3700,8 +3899,6 @@ namespace ClashDetection
 				mensaje2 = mensaje + Environment.NewLine + "\nSon: " + clash_yesA.Count().ToString() + " el numero de Elementos con Clashes : " + Environment.NewLine + msg;
 				TaskDialog.Show("Revit", mensaje2);
 			}
-
-
 
 			void DYNO_ClashManage()
 			{
@@ -5443,6 +5640,8 @@ namespace ClashDetection
 
 			} // Elem vs FamilyInstance // Todo documento
 
+
+
 			void DYNO_IntersectMultipleFamilyInstanceToMultipleCategory_UI(List<BuiltInCategory> UI_list1_, List<BuiltInCategory> UI_list4_)
 			{
 				// Find intersections between Ducts category with selected element
@@ -6179,7 +6378,7 @@ namespace ClashDetection
 						FilteredElementCollector collector = new FilteredElementCollector(doc);
 
 						Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+						Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
 
 						FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6195,8 +6394,9 @@ namespace ClashDetection
 
 
 						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-						filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
-
+						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																											   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+						filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 						for (int i = 0; i < lista_filtros.Count(); i++)
 						{
@@ -6275,7 +6475,135 @@ namespace ClashDetection
 				}
 
 
-			}// Crea filtros en la vista activa
+			}// Crea filtros en la lista de vistas ingresadas
+
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInMultipleViews_UI(List<View3D> lista_3dviews) // Crea filtros en la vista activa
+			{
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
+
+
+
+				foreach (View3D view3d in lista_3dviews)
+				{
+
+					//View activeView = this.ActiveUIDocument.ActiveView;
+					View activeView = view3d;
+
+					//			 	List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					//				List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+					{
+						ta.Start();
+
+						//activeView.Name = "COORD";
+						List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+						List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+						FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+						Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+						FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+						List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+						foreach (ParameterFilterElement e in collector_filterview)
+						{
+							lista_filtros.Add(e);
+						}
+
+
+						List<FilterRule> filterRules = new List<FilterRule>();
+
+						filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+
+
+						for (int i = 0; i < lista_filtros.Count(); i++)
+						{
+							if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+							{
+								lista_ParameterFilterElement.Add(lista_filtros[i]);
+								i = lista_filtros.Count();
+								break;
+							}
+
+						}
+
+						if (lista_ParameterFilterElement.Count() == 0)
+						{
+							ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+							//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+							lista_ParameterFilterElement.Add(parameterFilterElement);
+						}
+
+
+
+						ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+						OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+						ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+						ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+						ogs3.SetSurfaceForegroundPatternVisible(true);
+						ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+						activeView.AddFilter(aa.Id);
+
+						activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+						ta.Commit();
+					}
+				}
+
+
+			}// Crea filtros en la lista de vistas ingresadas
+
 
 			void DYNO_CreateClashFilterMultipleElementsInView_UI(View3D view_3d) // Crea filtros en la vista activa
 			{
@@ -6340,8 +6668,8 @@ namespace ClashDetection
 
 					FilteredElementCollector collector = new FilteredElementCollector(doc);
 
-					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash"); // Clash
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved"); // Clash Solved
 
 					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6356,9 +6684,10 @@ namespace ClashDetection
 					List<FilterRule> filterRules_no = new List<FilterRule>();
 
 
-					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
-
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true)); // Clash , EQUAL,  "YES", 
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																										   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 					for (int i = 0; i < lista_filtros.Count(); i++)
 					{
@@ -6435,7 +6764,129 @@ namespace ClashDetection
 					ta.Commit();
 				}
 
-			}// Crea filtros en la vista activa
+			}// Crea filtros en la vista ingresada
+
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(View3D view_3d) // Crea filtros en la vista activa
+			{
+
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				// Get Active View
+				//View activeView = this.ActiveUIDocument.ActiveView;
+				View activeView = view_3d;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
+
+
+
+				using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+				{
+					ta.Start();
+
+					//activeView.Name = "COORD";
+					List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+					List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+					foreach (ParameterFilterElement e in collector_filterview)
+					{
+						lista_filtros.Add(e);
+					}
+
+
+					List<FilterRule> filterRules = new List<FilterRule>();
+
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+
+
+					for (int i = 0; i < lista_filtros.Count(); i++)
+					{
+						if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+						{
+							lista_ParameterFilterElement.Add(lista_filtros[i]);
+							i = lista_filtros.Count();
+							break;
+						}
+
+					}
+
+					if (lista_ParameterFilterElement.Count() == 0)
+					{
+						ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+						//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+						lista_ParameterFilterElement.Add(parameterFilterElement);
+					}
+
+
+
+					ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+					OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+					ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternVisible(true);
+					ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+					activeView.AddFilter(aa.Id);
+
+					activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+					ta.Commit();
+				}
+
+			}// Crea filtros en la vista ingresada
+
 
 			void DYNO_CreateClashFilterMultipleElementsInView() // Crea filtros en la vista activa
 			{
@@ -6500,7 +6951,7 @@ namespace ClashDetection
 					FilteredElementCollector collector = new FilteredElementCollector(doc);
 
 					Parameter param = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash");
-
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
 
 					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
 
@@ -6516,7 +6967,9 @@ namespace ClashDetection
 
 
 					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param.Id, "YES", true));
-					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id, "YES", true));
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)0)); // Clash Solved , EQUAL,  False(int=0),
+																										   //filterRules_no.Add(ParameterFilterRuleFactory.CreateNotEqualsRule(param.Id,"YES", true));
+					filterRules_no.Add(ParameterFilterRuleFactory.CreateNotContainsRule(param.Id, "YES", true));
 
 
 					for (int i = 0; i < lista_filtros.Count(); i++)
@@ -6595,9 +7048,122 @@ namespace ClashDetection
 				}
 			}// Crea filtros en la vista activa
 
+			void DYNO_CreateClashSOLVEDFilterMultipleElementsInView() // Crea filtros en la vista activa
+			{
+				//Document doc = this.ActiveUIDocument.Document;
+				//UIDocument uidoc = this.ActiveUIDocument;
+
+				// Get Active View
+				View activeView = uidoc.ActiveView;
+				//View activeView = view_3d;
+
+				FilteredElementCollector elementss = new FilteredElementCollector(doc);
+				FillPatternElement solidFillPattern = elementss.OfClass(typeof(FillPatternElement)).Cast<FillPatternElement>().First(a => a.GetFillPattern().IsSolidFill);
+
+				List<ElementId> cats = new List<ElementId>();
+
+				cats.Add(new ElementId(BuiltInCategory.OST_DuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_PipeCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_Conduit));
+				cats.Add(new ElementId(BuiltInCategory.OST_CableTray));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexDuctCurves));
+				cats.Add(new ElementId(BuiltInCategory.OST_FlexPipeCurves));
+
+				BuiltInCategory[] bics_familyIns = new BuiltInCategory[]
+					{
+					    //BuiltInCategory.OST_CableTray,
+					    BuiltInCategory.OST_CableTrayFitting,
+					    //BuiltInCategory.OST_Conduit,
+					    BuiltInCategory.OST_ConduitFitting,
+					    //BuiltInCategory.OST_DuctCurves,
+					    BuiltInCategory.OST_DuctFitting,
+						BuiltInCategory.OST_DuctTerminal,
+						BuiltInCategory.OST_ElectricalEquipment,
+						BuiltInCategory.OST_ElectricalFixtures,
+						BuiltInCategory.OST_LightingDevices,
+						BuiltInCategory.OST_LightingFixtures,
+						BuiltInCategory.OST_MechanicalEquipment,
+					    //BuiltInCategory.OST_PipeCurves,
+					    //BuiltInCategory.OST_FlexDuctCurves,
+					    //BuiltInCategory.OST_FlexPipeCurves,
+					    BuiltInCategory.OST_PipeFitting,
+						BuiltInCategory.OST_PlumbingFixtures,
+						BuiltInCategory.OST_SpecialityEquipment,
+						BuiltInCategory.OST_Sprinklers,
+					    //BuiltInCategory.OST_Wire,
+					};
+
+				foreach (BuiltInCategory bic in bics_familyIns)
+				{
+					cats.Add(new ElementId(bic));
+				}
 
 
 
+				using (Transaction ta = new Transaction(doc, "create clash solved filter view"))
+				{
+					ta.Start();
+
+					//activeView.Name = "COORD";
+					List<ParameterFilterElement> lista_ParameterFilterElement = new List<ParameterFilterElement>();
+					List<ParameterFilterElement> lista_ParameterFilterElement_no = new List<ParameterFilterElement>();
+
+					FilteredElementCollector collector = new FilteredElementCollector(doc);
+
+					Parameter param_solved = collector.OfClass(typeof(Duct)).FirstElement().LookupParameter("Clash Solved");
+
+					FilteredElementCollector collector_filterview = new FilteredElementCollector(doc).OfClass(typeof(ParameterFilterElement));
+
+					List<ParameterFilterElement> lista_filtros = new List<ParameterFilterElement>();
+					foreach (ParameterFilterElement e in collector_filterview)
+					{
+						lista_filtros.Add(e);
+					}
+
+
+					List<FilterRule> filterRules = new List<FilterRule>();
+
+					filterRules.Add(ParameterFilterRuleFactory.CreateEqualsRule(param_solved.Id, (int)1)); // Clash Solved , EQUAL,  False(int=0),
+
+					for (int i = 0; i < lista_filtros.Count(); i++)
+					{
+						if (lista_filtros[i].Name == "CLASH SOLVED FILTER")
+						{
+							lista_ParameterFilterElement.Add(lista_filtros[i]);
+							i = lista_filtros.Count();
+							break;
+						}
+
+					}
+
+					if (lista_ParameterFilterElement.Count() == 0)
+					{
+						ParameterFilterElement parameterFilterElement = ParameterFilterElement.Create(doc, "CLASH SOLVED FILTER", cats, filterRules);
+						//ParameterFilterElement parameterFilterElement_no = ParameterFilterElement.Create(doc, "CLASH NO FILTER", cats, filterRules_no);
+
+						lista_ParameterFilterElement.Add(parameterFilterElement);
+					}
+
+
+
+					ParameterFilterElement aa = lista_ParameterFilterElement.First();
+
+
+					OverrideGraphicSettings ogs3 = new OverrideGraphicSettings();
+					ogs3.SetProjectionLineColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternColor(new Color(192, 192, 192));
+					ogs3.SetSurfaceForegroundPatternVisible(true);
+					ogs3.SetSurfaceForegroundPatternId(solidFillPattern.Id);
+
+					activeView.AddFilter(aa.Id);
+
+					activeView.SetFilterOverrides(aa.Id, ogs3);
+
+
+
+					ta.Commit();
+				}
+			}// Crea filtro cLASH solVED en la vista activa
 
 
 			void DYNO_ClashComments()
@@ -6813,8 +7379,8 @@ namespace ClashDetection
 			{
 				//Document doc = this.ActiveUIDocument.Document;
 				//UIDocument uidoc = this.ActiveUIDocument;
-				//// Get Active View
-				//View activeView = this.ActiveUIDocument.ActiveView;
+				// Get Active View
+				View activeView = uidoc.ActiveView;
 
 				// get elements with "clash" parameter value == "YES"
 				IList<Element> clash = new List<Element>();
@@ -7093,7 +7659,7 @@ namespace ClashDetection
 			{
 				//Document doc = this.ActiveUIDocument.Document;
 				//UIDocument uidoc = this.ActiveUIDocument;
-				//// Get Active View
+				// Get Active View
 				View activeView = uidoc.ActiveView;
 
 				// get elements with "clash" parameter value == "YES"
@@ -7614,6 +8180,8 @@ namespace ClashDetection
 					//Parameter param2 = e.LookupParameter("Clash Solved");
 					//Parameter param3 = e.LookupParameter("Clash Comments");
 					Parameter param4 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7623,6 +8191,7 @@ namespace ClashDetection
 						//param2.Set(1);
 						//param3.Set(param_value);
 						param4.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7632,6 +8201,9 @@ namespace ClashDetection
 					Parameter param = e.LookupParameter("Clash");
 					//Parameter param2 = e.LookupParameter("Clash Comments");
 					Parameter param3 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7640,6 +8212,7 @@ namespace ClashDetection
 						param.Set(param_value);
 						//param2.Set(param_value);
 						param3.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7707,6 +8280,8 @@ namespace ClashDetection
 					//Parameter param2 = e.LookupParameter("Clash Solved");
 					//Parameter param3 = e.LookupParameter("Clash Comments");
 					Parameter param4 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7716,6 +8291,7 @@ namespace ClashDetection
 						//param2.Set(1);
 						//param3.Set(param_value);
 						param4.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -7725,6 +8301,8 @@ namespace ClashDetection
 					Parameter param = e.LookupParameter("Clash");
 					//Parameter param2 = e.LookupParameter("Clash Comments");
 					Parameter param3 = e.LookupParameter("Clash Grid Location");
+					Parameter param5 = e.LookupParameter("Clash Category");
+
 					string param_value = "";
 
 					using (Transaction t = new Transaction(doc, "Set No value to Clash elements in Active View"))
@@ -7733,6 +8311,7 @@ namespace ClashDetection
 						param.Set(param_value);
 						//param2.Set(param_value);
 						param3.Set(param_value);
+						param5.Set(param_value);
 						t.Commit();
 					}
 				}
@@ -8769,7 +9348,7 @@ namespace ClashDetection
 						}
 					}
 				}
-				TaskDialog.Show("Creating CLASH Schedule", msg + "Se agregaron las siguientes columnas a las tablas: \n\n" + msg3 + Environment.NewLine);
+				TaskDialog.Show("Creation CLASH Parameters", msg + "Se crearon los siguientes Clash Parameters: \n\n" + msg3 + Environment.NewLine);
 				// bic in bics
 
 			}
@@ -8779,7 +9358,6 @@ namespace ClashDetection
 				//UIDocument uidoc = this.ActiveUIDocument;
 				//Document doc = this.ActiveUIDocument.Document;
 				//Application app = this.Application;
-
 				View view = doc.ActiveView;
 				string view_name = view.Name.ToString(); // nombre de la vista activa 
 				List<bool> listabool_3 = new List<bool>();
@@ -8948,12 +9526,15 @@ namespace ClashDetection
 
 							uidoc.ActiveView = dupleView;
 							DYNO_CreateClashFilterMultipleElementsInView_UI(dupleView);
-						}
+							DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(dupleView);
 
+						}
+						DYNO_CreateClashSOLVEDFilterMultipleElementsInView(); // Crea y coloca el filtro CLASH SOLVED a la vista FILTER VIEW
 					}
 					else if (listabool_1.First() && !(listabool_2.First()) && !(listabool_3.First()))
 					{
 						DYNO_create3DClashSectionBoxView_ELEMENT();
+
 					}
 					else if (listabool_2.First() && !(listabool_1.First()) && !(listabool_3.First()))
 					{
@@ -8983,121 +9564,76 @@ namespace ClashDetection
 				}
 				// get list of all levels
 				//IList<Level> levels = new FilteredElementCollector(doc).OfClass(typeof(Level)).Cast<Level>().OrderBy(l => l.Elevation).ToList();
-
-
-				// get a ViewFamilyType for a 3D View
-				ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
-												 OfClass(typeof(ViewFamilyType)).
-												 Cast<ViewFamilyType>()
-												 where v.ViewFamily == ViewFamily.ThreeDimensional
-												 select v).First();
-
-				List<View3D> tresDclashview = new List<View3D>();
-
-				using (Transaction t = new Transaction(doc, "Create clash 3d view"))
+				if (clash_elements.Count() == 0)
 				{
-					int ctr = 0;
-					// loop through all Elements
-					foreach (Element elem in clash_elements)
-					{
-						t.Start();
-
-						// Create the 3d view
-						View3D clashview = View3D.CreateIsometric(doc, viewFamilyType.Id);
-
-						Parameter param = elem.LookupParameter("Clash Category");
-
-						string param_string = param.AsString();
-						string param_string2 = param_string.Replace(':', '_');
-
-						// Set the name of the view
-						clashview.Name = "COORD - Section Box  " + elem.Name.ToString() + " / "
-																+ "ID  " + elem.Id.ToString() + " / "
-																+ " Clash Category " + param_string2;
-
-
-
-
-						// Set the name of the transaction
-						// A transaction can be renamed after it has been started
-						t.SetName("Create view " + clashview.Name);
-
-						// Create a new BoundingBoxXYZ to define a 3D rectangular space
-						BoundingBoxXYZ elem_bb = elem.get_BoundingBox(null);
-
-						//		            double Min_Z = double.MaxValue;
-						//									
-						//					// encontrar Min_Y , Min_X , Max_X , Max_Y
-						//					double Min_X = double.MaxValue;
-						//					double Min_Y = double.MaxValue;
-						//									
-						//					double Max_X = double.MinValue;
-						//					double Max_Y = double.MinValue;
-						//					double Max_Z = double.MinValue;
-						//							        
-						//
-						//
-						//									    
-						//					if( elem_bb.Max.X > Max_X )
-						//					{
-						//						Max_X = elem_bb.Max.X;
-						//					}
-						//					if( elem_bb.Max.Y > Max_Y )
-						//					{
-						//						Max_Y = elem_bb.Max.Y;
-						//					}
-						//					if( elem_bb.Max.Z > Max_Z )
-						//					{
-						//						Max_Z = elem_bb.Max.Z;
-						//					}
-						//
-						//					if( elem_bb.Min.X < Min_X )
-						//					{
-						//						Min_X = elem_bb.Min.X;
-						//					}
-						//					if( elem_bb.Min.Y < Min_Y )
-						//					{
-						//						Min_Y = elem_bb.Min.Y;
-						//					}
-						//					if( elem_bb.Min.Z < Min_Z )
-						//					{
-						//						Min_Z = elem_bb.Min.Z;
-						//					}
-						//									
-						//									
-						//					double m = 5;
-						//									
-						//					XYZ Max = new XYZ( Max_X-m, Max_Y-m, Max_Z-m);
-						//					XYZ Min = new XYZ( Min_X+m, Min_Y+m, Min_Z+m);
-						//									
-						//									
-						//					BoundingBoxXYZ myBox = new BoundingBoxXYZ();
-						//									
-						//					myBox.Min = Min;
-						//					myBox.Max = Max;
-						//					
-						//					
-						//		            clashview.SetSectionBox(myBox);
-						clashview.SetSectionBox(elem_bb);
-
-						//					if (!clashview.IsTemplate) 
-						//					{
-						clashview.DisplayStyle = DisplayStyle.Shading;
-						clashview.DetailLevel = ViewDetailLevel.Fine;
-						//					}
-
-						t.Commit();
-
-						// Open the just-created view
-						// There cannot be an open transaction when the active view is set
-						tresDclashview.Add(clashview);
-
-						ctr++;
-					}
-					uidoc.ActiveView = tresDclashview.First();
-					DYNO_CreateClashFilterMultipleElementsInMultipleViews_UI(tresDclashview);
-
+					TaskDialog.Show("Dynoscript", "No se encontraron Elementos con Clash en la Vista Activa!");
+					return;
 				}
+				else
+				{
+					// get a ViewFamilyType for a 3D View
+					ViewFamilyType viewFamilyType = (from v in new FilteredElementCollector(doc).
+													 OfClass(typeof(ViewFamilyType)).
+													 Cast<ViewFamilyType>()
+													 where v.ViewFamily == ViewFamily.ThreeDimensional
+													 select v).First();
+
+					List<View3D> tresDclashview = new List<View3D>();
+
+					using (Transaction t = new Transaction(doc, "Create clash 3d view"))
+					{
+						int ctr = 0;
+						// loop through all Elements
+						foreach (Element elem in clash_elements)
+						{
+							t.Start();
+
+							// Create the 3d view
+							View3D clashview = View3D.CreateIsometric(doc, viewFamilyType.Id);
+
+							Parameter param = elem.LookupParameter("Clash Category");
+
+							string param_string = param.AsString();
+							string param_string2 = param_string.Replace(':', '_');
+
+							// Set the name of the view
+							clashview.Name = "COORD - Section Box  " + elem.Name.ToString() + " / "
+																	+ "ID  " + elem.Id.ToString() + " / "
+																	+ " Clash Category " + param_string2;
+
+
+
+
+							// Set the name of the transaction
+							// A transaction can be renamed after it has been started
+							t.SetName("Create view " + clashview.Name);
+
+							// Create a new BoundingBoxXYZ to define a 3D rectangular space
+							BoundingBoxXYZ elem_bb = elem.get_BoundingBox(null);
+
+							clashview.SetSectionBox(elem_bb);
+
+							//					if (!clashview.IsTemplate) 
+							//					{
+							clashview.DisplayStyle = DisplayStyle.Shading;
+							clashview.DetailLevel = ViewDetailLevel.Fine;
+							//					}
+
+							t.Commit();
+
+							// Open the just-created view
+							// There cannot be an open transaction when the active view is set
+							tresDclashview.Add(clashview);
+
+							ctr++;
+						}
+						uidoc.ActiveView = tresDclashview.First();
+						DYNO_CreateClashFilterMultipleElementsInMultipleViews_UI(tresDclashview);
+						DYNO_CreateClashSOLVEDFilterMultipleElementsInMultipleViews_UI(tresDclashview);
+					}
+				}
+
+
 			} // ONLY THE ACTIVE VIEW
 
 			void DYNO_create3DClashSectionBoxView_LEVELS()
@@ -9175,6 +9711,7 @@ namespace ClashDetection
 				foreach (View3D view in lista3dview)
 				{
 					DYNO_CreateClashFilterMultipleElementsInView_UI(view);
+					DYNO_CreateClashSOLVEDFilterMultipleElementsInView_UI(view);
 				}
 
 
@@ -10230,7 +10767,6 @@ namespace ClashDetection
 				uidoc.ActiveView = tresDclashview.First();
 
 			}
-
 
 			List<Element> DYNO_GetAllClashElements_OnlyActiveView()
 			{

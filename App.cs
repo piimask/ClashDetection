@@ -33,9 +33,12 @@ namespace ClashDetection
         public Result OnStartup(UIControlledApplication application)
         {
             // Todo el código para crear los botones en la Ribbon
+            // Crear Tab 1 Dynoscript
+            string tabName = "QuickClash";
+            application.CreateRibbonTab(tabName);
 
             // Crear Panel 1
-            RibbonPanel panel1 = application.CreateRibbonPanel("Clash Manage");
+            RibbonPanel panel1 = application.CreateRibbonPanel(tabName, "Clash Manage");
 
 
             // Agregar un botón a Panel 1
@@ -57,7 +60,7 @@ namespace ClashDetection
             boton3.LongDescription = "Escogemos entre qué Categorias de Elementos queremos hacer el Análisis de Colisiones o Interferencias. Se elige si en la Vista Activa o si en todo el Documento. \nDependiento del tamaño del documento o archivo si se eligen muchas Categorias para el Análisis este proceso puede demorar varios minutos. ";
 
             // Crear Panel 2
-            RibbonPanel panel2 = application.CreateRibbonPanel("Clash Review");
+            RibbonPanel panel2 = application.CreateRibbonPanel(tabName, "Clash Review");
 
             // Agregar un botón a Panel 2
             PushButton boton4 = panel2.AddItem(new PushButtonData("boton4", "Quick Clash", ExecutingAssemblyPath, "ClashDetection.BUTTON_4_QuickClash")) as PushButton;
