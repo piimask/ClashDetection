@@ -106,11 +106,24 @@
             this.checkedListBox1.FormattingEnabled = true;
             this.checkedListBox1.Items.AddRange(new object[] {
             "CableTray",
+            "CableTrayFitting",
             "Conduit",
+            "ConduitFitting",
             "Duct",
-            "Pipe",
             "FlexDuct",
-            "FlexPipe"});
+            "DuctFitting",
+            "DuctTerminal",
+            "ElectricalEquipment",
+            "ElectricalFixtures",
+            "LightingDevices",
+            "LightingFixtures",
+            "MechanicalEquipment",
+            "Pipe",
+            "FlexPipe",
+            "PipeFitting",
+            "PlumbingFixtures",
+            "SpecialityEquipment",
+            "Sprinklers"});
             this.checkedListBox1.Location = new System.Drawing.Point(157, 19);
             this.checkedListBox1.Name = "checkedListBox1";
             this.checkedListBox1.Size = new System.Drawing.Size(189, 94);

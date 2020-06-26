@@ -18,6 +18,8 @@ namespace ClashDetection
 
         public bool checkBox_3 { get; set; }
 
+        public bool checkBox_4 { get; set; }
+
         public Form3()
         {
             InitializeComponent();
@@ -36,6 +38,11 @@ namespace ClashDetection
         private void checkBox3_CheckedChanged(object sender, EventArgs e)
         {
             checkBox_3 = checkBox3.Checked;
+        }
+
+        private void checkBox4_CheckedChanged(object sender, EventArgs e)
+        {
+            checkBox_4 = checkBox4.Checked;
         }
     }
 }
