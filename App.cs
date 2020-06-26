@@ -48,16 +48,16 @@ namespace ClashDetection
 
             // Agregar Imagen al botón
             boton1.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/architech-working-(1).png"));
-            boton1.ToolTip = "Crea todos los Clash Parameters o reinicia todo el Análisis";
-            boton1.LongDescription = "Iniciamos Quick Clash Tool creando todos los Clash Parameters o volviendolos a sus valores por defecto si ya existen. ";
+            boton1.ToolTip = "Create all Clash Parameters or restart all Analysis";
+            boton1.LongDescription = "We start the Quick Clash Tool by creating all the Clash Parameters or returning them to their default values if they already exist.";
 
             boton2.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/check-list-(1).png"));
-            boton2.ToolTip = "Gestiona qué Categorias Analizar";
-            boton2.LongDescription = "Escogemos entre qué Categorias de Elementos queremos hacer el Análisis de Colisiones o Interferencias. Se elige si en la Vista Activa o si en todo el Documento. \nDependiento del tamaño del documento o archivo si se eligen muchas Categorias para el Análisis este proceso puede demorar varios minutos. ";
+            boton2.ToolTip = "Manage which Categories to Analyze";
+            boton2.LongDescription = "We choose between which Categories of Elements we want to do the Analysis of Collisions or Interferences. It is chosen whether in Active View or if in the entire Document. \nnDepending on the size of the document or file, if many Categories are chosen for the Analysis, this process may take several minutes.";
 
             boton3.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/3d-(1).png"));
-            boton3.ToolTip = "Escoge qué Section Box Aplicar";
-            boton3.LongDescription = "Escogemos entre qué Categorias de Elementos queremos hacer el Análisis de Colisiones o Interferencias. Se elige si en la Vista Activa o si en todo el Documento. \nDependiento del tamaño del documento o archivo si se eligen muchas Categorias para el Análisis este proceso puede demorar varios minutos. ";
+            boton3.ToolTip = "Choose which Section Box to Apply";
+            boton3.LongDescription = "We choose between which Categories of Elements we want to do the Analysis of Collisions or Interferences. It is chosen whether in Active View or if in the entire Document. \nDepending on the size of the document or file, if many Categories are chosen for the Analysis, this process may take several minutes.";
 
             // Crear Panel 2
             RibbonPanel panel2 = application.CreateRibbonPanel(tabName, "Clash Review");
@@ -69,16 +69,16 @@ namespace ClashDetection
 
             // Agregar Imagen al botón
             boton4.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/pipes-angles-(1).png"));
-            boton4.ToolTip = "Análisis Rápido";
-            boton4.LongDescription = "Análisis de Colisiones Rápido de todas las Categorías contra todas las Categorías de la Vista Activa. ";
+            boton4.ToolTip = "Quick Analysis";
+            boton4.LongDescription = "Quick Collision Analysis of all Categories against all Categories in Active View.";
 
             boton5.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/broom-(1).png"));
-            boton5.ToolTip = "Limpiar parámetros de la Vista Activa";
-            boton5.LongDescription = "Borra o devuelve a sus valores por defecto los Clash Parameters de la Vista Activa. Menos los parámetros: 'Clash Solved' y 'Clash Comments'. ";
+            boton5.ToolTip = "Clear Active View parameters";
+            boton5.LongDescription = "Delete or return the Clash Parameters from the Active View to their default values. Minus the parameters: 'Clash Solved' and 'Clash Comments'.";
 
             boton6.LargeImage = new BitmapImage(new Uri("pack://application:,,,/ClashDetection;component/Resources/edit-(1).png"));
-            boton6.ToolTip = "Comenta los Elementos pendientes de revisión";
-            boton6.LongDescription = "Se escribirá el comentario en los Elementos con CLASH de la Vista Activa. ";
+            boton6.ToolTip = "Comment on the Items pending revision";
+            boton6.LongDescription = "The comment will be written in the Elements with CLASH of the Active View.";
 
             return Result.Succeeded;
         }

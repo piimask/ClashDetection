@@ -59,7 +59,7 @@
             this.groupBox1.Size = new System.Drawing.Size(355, 273);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Selecciona qué grupo de Categorias intersectar :";
+            this.groupBox1.Text = "Select which group of Categories to intersect:";
             // 
             // label3
             // 
@@ -135,9 +135,9 @@
             this.checkBox3.AutoSize = true;
             this.checkBox3.Location = new System.Drawing.Point(12, 161);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(109, 17);
+            this.checkBox3.Size = new System.Drawing.Size(89, 17);
             this.checkBox3.TabIndex = 5;
-            this.checkBox3.Text = "Todo Documento";
+            this.checkBox3.Text = "All Document";
             this.checkBox3.UseVisualStyleBackColor = true;
             this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
@@ -150,7 +150,7 @@
             this.checkBox1.Name = "checkBox1";
             this.checkBox1.Size = new System.Drawing.Size(106, 17);
             this.checkBox1.TabIndex = 4;
-            this.checkBox1.Text = "Solo Vista Activa";
+            this.checkBox1.Text = "Only Active View";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
@@ -180,18 +180,18 @@
             this.label2.AutoSize = true;
             this.label2.Location = new System.Drawing.Point(12, 119);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(116, 13);
+            this.label2.Size = new System.Drawing.Size(104, 13);
             this.label2.TabIndex = 1;
-            this.label2.Text = "Grupo de Categorias 2:";
+            this.label2.Text = "Categories Group  2:";
             // 
             // label1
             // 
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 19);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(116, 13);
+            this.label1.Size = new System.Drawing.Size(101, 13);
             this.label1.TabIndex = 0;
-            this.label1.Text = "Grupo de Categorias 1:";
+            this.label1.Text = "Categories Group 1:";
             // 
             // Form2
             // 

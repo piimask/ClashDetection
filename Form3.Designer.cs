@@ -53,16 +53,16 @@
             this.groupBox1.Size = new System.Drawing.Size(371, 161);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Aplicar SectionBox a: ";
+            this.groupBox1.Text = "Apply SectionBox to:";
             // 
             // checkBox4
             // 
             this.checkBox4.AutoSize = true;
             this.checkBox4.Location = new System.Drawing.Point(12, 88);
             this.checkBox4.Name = "checkBox4";
-            this.checkBox4.Size = new System.Drawing.Size(349, 17);
+            this.checkBox4.Size = new System.Drawing.Size(352, 17);
             this.checkBox4.TabIndex = 5;
-            this.checkBox4.Text = "Separar por ZONAS (Ejes) Elementos con CLASH en la Vista Activa.";
+            this.checkBox4.Text = "Separate by ZONES (Axes) Elements with CLASH in the Active View.";
             this.checkBox4.UseVisualStyleBackColor = true;
             this.checkBox4.CheckedChanged += new System.EventHandler(this.checkBox4_CheckedChanged);
             // 
@@ -91,9 +91,9 @@
             this.checkBox3.AutoSize = true;
             this.checkBox3.Location = new System.Drawing.Point(12, 65);
             this.checkBox3.Name = "checkBox3";
-            this.checkBox3.Size = new System.Drawing.Size(178, 17);
+            this.checkBox3.Size = new System.Drawing.Size(156, 17);
             this.checkBox3.TabIndex = 2;
-            this.checkBox3.Text = "Solo Elementos Seleccionados. ";
+            this.checkBox3.Text = "Only Selected ELEMENTS.";
             this.checkBox3.UseVisualStyleBackColor = true;
             this.checkBox3.CheckedChanged += new System.EventHandler(this.checkBox3_CheckedChanged);
             // 
@@ -102,9 +102,9 @@
             this.checkBox2.AutoSize = true;
             this.checkBox2.Location = new System.Drawing.Point(12, 42);
             this.checkBox2.Name = "checkBox2";
-            this.checkBox2.Size = new System.Drawing.Size(202, 17);
+            this.checkBox2.Size = new System.Drawing.Size(193, 17);
             this.checkBox2.TabIndex = 1;
-            this.checkBox2.Text = "Separar por Niveles proyecto entero. ";
+            this.checkBox2.Text = "Separate by LEVELS entire project.";
             this.checkBox2.UseVisualStyleBackColor = true;
             this.checkBox2.CheckedChanged += new System.EventHandler(this.checkBox2_CheckedChanged);
             // 
@@ -113,9 +113,9 @@
             this.checkBox1.AutoSize = true;
             this.checkBox1.Location = new System.Drawing.Point(12, 19);
             this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(225, 17);
+            this.checkBox1.Size = new System.Drawing.Size(217, 17);
             this.checkBox1.TabIndex = 0;
-            this.checkBox1.Text = "Elementos con CLASH en la Vista Activa. ";
+            this.checkBox1.Text = "ELEMENTS with CLASH in Active View.";
             this.checkBox1.UseVisualStyleBackColor = true;
             this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 

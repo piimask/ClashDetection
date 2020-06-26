@@ -43,7 +43,7 @@
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(89, 53);
             this.button1.TabIndex = 0;
-            this.button1.Text = "ENVIAR";
+            this.button1.Text = "SEND";
             this.button1.UseVisualStyleBackColor = true;
             // 
             // button2
@@ -53,7 +53,7 @@
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(89, 33);
             this.button2.TabIndex = 1;
-            this.button2.Text = "CANCELAR";
+            this.button2.Text = "CANCEL";
             this.button2.UseVisualStyleBackColor = true;
             // 
             // textBox1
@@ -76,7 +76,7 @@
             this.groupBox1.Size = new System.Drawing.Size(381, 119);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Se escribirá el comentario en los Elementos con CLASH de la Vista Activa:";
+            this.groupBox1.Text = "The comment will be written in the Elements with CLASH of the Active View:";
             // 
             // Form1
             // 
